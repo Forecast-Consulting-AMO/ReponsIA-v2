@@ -1,0 +1,27 @@
+{
+  "common": {
+    "appName": "FC App",
+    "loading": "Laden...",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "delete": "Verwijderen",
+    "confirm": "Bevestigen",
+    "back": "Terug",
+    "next": "Volgende",
+    "search": "Zoeken"
+  },
+  "nav": {
+    "home": "Startpagina",
+    "settings": "Instellingen"
+  },
+  "errors": {
+    "http": {
+      "generic": "Er is een fout opgetreden",
+      "unauthorized": "Niet geautoriseerd",
+      "forbidden": "Toegang verboden",
+      "notFound": "Bron niet gevonden",
+      "serverError": "Serverfout",
+      "serviceUnavailable": "Service niet beschikbaar"
+    }
+  }
+}

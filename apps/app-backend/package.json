@@ -1,0 +1,49 @@
+{
+  "name": "@fc/app-backend",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.app.json",
+    "migration:generate": "typeorm-ts-node-commonjs migration:generate -d src/data-source.ts",
+    "migration:run": "typeorm-ts-node-commonjs migration:run -d src/data-source.ts",
+    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/data-source.ts"
+  },
+  "nx": {
+    "targets": {
+      "build": {
+        "executor": "@nx/webpack:webpack",
+        "outputs": ["{options.outputPath}"],
+        "options": {
+          "outputPath": "dist/apps/app-backend",
+          "tsConfig": "apps/app-backend/tsconfig.app.json",
+          "main": "apps/app-backend/src/main.ts",
+          "webpackConfig": "apps/app-backend/webpack.config.js",
+          "generatePackageJson": true
+        }
+      },
+      "serve": {
+        "executor": "@nx/js:node",
+        "options": {
+          "buildTarget": "app-backend:build",
+          "watch": true
+        }
+      },
+      "test": {
+        "executor": "@nx/jest:jest",
+        "options": {
+          "jestConfig": "apps/app-backend/jest.config.ts"
+        }
+      },
+      "lint": {
+        "executor": "@nx/eslint:lint"
+      },
+      "docker-build": {
+        "executor": "nx:run-commands",
+        "options": {
+          "command": "docker build -f apps/app-backend/Dockerfile . -t fc-app-backend"
+        }
+      }
+    },
+    "tags": ["type:app", "platform:backend"]
+  }
+}

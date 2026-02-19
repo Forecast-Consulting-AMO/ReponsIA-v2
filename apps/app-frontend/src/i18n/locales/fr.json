@@ -1,0 +1,27 @@
+{
+  "common": {
+    "appName": "FC App",
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "search": "Rechercher"
+  },
+  "nav": {
+    "home": "Accueil",
+    "settings": "Paramètres"
+  },
+  "errors": {
+    "http": {
+      "generic": "Une erreur est survenue",
+      "unauthorized": "Non autorisé",
+      "forbidden": "Accès interdit",
+      "notFound": "Ressource non trouvée",
+      "serverError": "Erreur serveur",
+      "serviceUnavailable": "Service indisponible"
+    }
+  }
+}

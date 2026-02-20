@@ -47,21 +47,36 @@ export class KnowledgeService {
   ): Promise<DocumentChunk[]> {
     await this.projectsService.verifyAccess(projectId, auth0Id)
 
-    const queryEmbedding = await this.aiService.embed(query)
+    // Early return if no indexed chunks exist for this project
+    const chunkCount = await this.chunkRepo.count({
+      where: { projectId },
+    })
+    if (chunkCount === 0) {
+      this.logger.debug(`No document chunks for project ${projectId}, returning empty search results`)
+      return []
+    }
 
-    return this.chunkRepo.query(
-      `
-      SELECT dc.*,
-        (1 - (dc.embedding <=> $1::vector)) * 0.6 +
-        COALESCE(ts_rank(dc.search_vector, plainto_tsquery('french', $2)), 0) * 0.3 +
-        COALESCE(similarity(dc.content, $2), 0) * 0.1 AS combined_score
-      FROM document_chunks dc
-      WHERE dc.project_id = $3
-        AND dc.embedding IS NOT NULL
-      ORDER BY combined_score DESC
-      LIMIT $4
-    `,
-      [JSON.stringify(queryEmbedding), query, projectId, limit],
-    )
+    try {
+      const queryEmbedding = await this.aiService.embed(query)
+
+      return await this.chunkRepo.query(
+        `
+        SELECT dc.*,
+          (1 - (dc.embedding <=> $1::vector)) * 0.6 +
+          COALESCE(ts_rank(dc.search_vector, plainto_tsquery('french', $2)), 0) * 0.3 +
+          COALESCE(similarity(dc.content, $2), 0) * 0.1 AS combined_score
+        FROM document_chunks dc
+        WHERE dc.project_id = $3
+          AND dc.embedding IS NOT NULL
+        ORDER BY combined_score DESC
+        LIMIT $4
+      `,
+        [JSON.stringify(queryEmbedding), query, projectId, limit],
+      )
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error)
+      this.logger.warn(`Knowledge search failed for project ${projectId}: ${message}`)
+      return []
+    }
   }
 }

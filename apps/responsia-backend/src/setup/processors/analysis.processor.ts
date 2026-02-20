@@ -64,9 +64,10 @@ export class AnalysisProcessor {
           doc.extractedText,
         )
 
-        // Parse JSON array of requirements
+        // Parse JSON array of requirements (strip markdown code fences if present)
         try {
-          const parsed = JSON.parse(response)
+          const cleaned = response.replace(/^```(?:json)?\s*\n?/m, '').replace(/\n?```\s*$/m, '').trim()
+          const parsed = JSON.parse(cleaned)
           const requirements = Array.isArray(parsed) ? parsed : [parsed]
 
           for (const req of requirements) {

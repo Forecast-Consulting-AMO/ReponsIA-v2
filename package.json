@@ -13,7 +13,9 @@
     "lint": "nx run-many --target=lint --all",
     "test": "nx run-many --target=test --all",
     "typecheck": "nx run-many --target=typecheck --all",
-    "build": "nx run-many --target=build --all"
+    "build": "nx run-many --target=build --all",
+    "dev:backend": "ts-node --project apps/responsia-backend/tsconfig.app.json -r tsconfig-paths/register apps/responsia-backend/src/main.ts",
+    "dev:frontend": "npx nx serve responsia-frontend"
   },
   "private": true,
   "dependencies": {

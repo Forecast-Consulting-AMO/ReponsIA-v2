@@ -18,19 +18,19 @@ export const configValidationSchema = Joi.object({
   }),
 
   // AI
-  ANTHROPIC_API_KEY: Joi.string().optional().default(''),
-  OPENAI_API_KEY: Joi.string().optional().default(''),
+  ANTHROPIC_API_KEY: Joi.string().optional().allow('').default(''),
+  OPENAI_API_KEY: Joi.string().optional().allow('').default(''),
 
   // Azure Blob Storage
-  AZURE_STORAGE_CONNECTION_STRING: Joi.string().optional().default(''),
+  AZURE_STORAGE_CONNECTION_STRING: Joi.string().optional().allow('').default(''),
   AZURE_STORAGE_CONTAINER: Joi.string().optional().default('responsia-documents'),
 
   // Azure Service Bus (empty = use local in-process queue)
-  AZURE_SERVICE_BUS_CONNECTION_STRING: Joi.string().optional().default(''),
+  AZURE_SERVICE_BUS_CONNECTION_STRING: Joi.string().optional().allow('').default(''),
 
   // Azure Document Intelligence OCR (optional)
-  AZURE_DI_ENDPOINT: Joi.string().optional().default(''),
-  AZURE_DI_KEY: Joi.string().optional().default(''),
+  AZURE_DI_ENDPOINT: Joi.string().optional().allow('').default(''),
+  AZURE_DI_KEY: Joi.string().optional().allow('').default(''),
 
   // Server
   PORT: Joi.number().optional().default(3000),

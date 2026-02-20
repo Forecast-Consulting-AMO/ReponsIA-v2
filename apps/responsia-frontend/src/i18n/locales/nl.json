@@ -1,0 +1,128 @@
+{
+  "common": {
+    "appName": "ReponsIA",
+    "loading": "Laden...",
+    "save": "Opslaan",
+    "cancel": "Annuleren",
+    "delete": "Verwijderen",
+    "confirm": "Bevestigen",
+    "back": "Terug",
+    "next": "Volgende",
+    "search": "Zoeken",
+    "create": "Aanmaken"
+  },
+  "nav": {
+    "home": "Startpagina",
+    "settings": "Instellingen",
+    "logout": "Uitloggen"
+  },
+  "auth": {
+    "login": "Inloggen",
+    "subtitle": "Beantwoord aanbestedingen met AI"
+  },
+  "dashboard": {
+    "title": "Mijn Projecten",
+    "newProject": "Nieuw Project",
+    "noProjects": "Nog geen projecten. Maak er een aan om te beginnen.",
+    "noDescription": "Geen beschrijving",
+    "search": "Projecten zoeken...",
+    "createProject": "Project aanmaken",
+    "confirmDelete": "Weet u zeker dat u dit project wilt verwijderen?"
+  },
+  "project": {
+    "name": "Projectnaam",
+    "description": "Beschrijving",
+    "notFound": "Project niet gevonden",
+    "status": {
+      "draft": "Concept",
+      "in_progress": "In uitvoering",
+      "completed": "Voltooid"
+    },
+    "setup": {
+      "title": "Voorbereiding"
+    },
+    "drafting": {
+      "title": "Redactie"
+    },
+    "review": {
+      "title": "Controle & Export"
+    }
+  },
+  "setup": {
+    "uploadTitle": "Projectdocumenten",
+    "upload": "Uploaden",
+    "startAnalysis": "Analyse starten",
+    "confirmTitle": "Analyse starten?",
+    "confirmMessage": "{{count}} document(en) worden door AI geanalyseerd. Extractie van vereisten, kennisindexering en feedbackanalyse worden gestart.",
+    "start": "Starten",
+    "jobs": {
+      "analysis": "Extractie van vereisten",
+      "indexing": "Kennisindexering",
+      "feedback": "Feedbackextractie",
+      "draft_all": "Automatisch opstellen"
+    }
+  },
+  "documents": {
+    "types": {
+      "rfp": "Aanbestedingsdocument",
+      "past_submission": "Vorige inzending",
+      "reference": "Referentiedocument",
+      "analysis_report": "Analyserapport",
+      "template": "Word-sjabloon"
+    }
+  },
+  "drafting": {
+    "requirements": "Vereisten",
+    "section": "Sectie",
+    "title": "Titel",
+    "type": "Type",
+    "status": "Status",
+    "draftAll": "Alles opstellen",
+    "draft": "Opstellen",
+    "responsePlaceholder": "Het antwoord verschijnt hier...",
+    "feedback": "Gekoppelde feedback",
+    "statuses": {
+      "pending": "In afwachting",
+      "drafted": "Opgesteld",
+      "reviewed": "Beoordeeld",
+      "final": "Definitief"
+    }
+  },
+  "review": {
+    "responded": "Beantwoord",
+    "finalized": "Definitief",
+    "qualityScore": "Kwaliteitsscore",
+    "checkCompliance": "Conformiteit controleren",
+    "exportDocx": "DOCX exporteren",
+    "complianceReport": "Conformiteitsrapport",
+    "coverage": "Dekking",
+    "warnings": "Waarschuwingen"
+  },
+  "chat": {
+    "title": "Assistent",
+    "placeholder": "Stel een vraag..."
+  },
+  "settings": {
+    "title": "Instellingen",
+    "models": "AI-modellen per bewerking",
+    "prompts": "Aangepaste prompts",
+    "promptPlaceholder": "Voer een aangepaste prompt in om de standaard systeemprompt te overschrijven...",
+    "operations": {
+      "analysis": "Analyse",
+      "drafting": "Redactie",
+      "feedback": "Feedback",
+      "compliance": "Conformiteit",
+      "chat": "Chat"
+    }
+  },
+  "errors": {
+    "http": {
+      "generic": "Er is een fout opgetreden",
+      "unauthorized": "Niet geautoriseerd",
+      "forbidden": "Toegang verboden",
+      "notFound": "Bron niet gevonden",
+      "serverError": "Serverfout",
+      "serviceUnavailable": "Service niet beschikbaar"
+    }
+  }
+}

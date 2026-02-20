@@ -1,0 +1,128 @@
+{
+  "common": {
+    "appName": "ReponsIA",
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "next": "Suivant",
+    "search": "Rechercher",
+    "create": "Créer"
+  },
+  "nav": {
+    "home": "Accueil",
+    "settings": "Paramètres",
+    "logout": "Déconnexion"
+  },
+  "auth": {
+    "login": "Se connecter",
+    "subtitle": "Répondez aux appels d'offres avec l'IA"
+  },
+  "dashboard": {
+    "title": "Mes projets",
+    "newProject": "Nouveau projet",
+    "noProjects": "Aucun projet. Créez-en un pour commencer.",
+    "noDescription": "Pas de description",
+    "search": "Rechercher un projet...",
+    "createProject": "Créer un projet",
+    "confirmDelete": "Voulez-vous vraiment supprimer ce projet ?"
+  },
+  "project": {
+    "name": "Nom du projet",
+    "description": "Description",
+    "notFound": "Projet introuvable",
+    "status": {
+      "draft": "Brouillon",
+      "in_progress": "En cours",
+      "completed": "Terminé"
+    },
+    "setup": {
+      "title": "Préparation"
+    },
+    "drafting": {
+      "title": "Rédaction"
+    },
+    "review": {
+      "title": "Revue & Export"
+    }
+  },
+  "setup": {
+    "uploadTitle": "Documents du projet",
+    "upload": "Importer",
+    "startAnalysis": "Lancer l'analyse",
+    "confirmTitle": "Lancer l'analyse ?",
+    "confirmMessage": "{{count}} document(s) seront analysés par l'IA. L'extraction des exigences, l'indexation des connaissances et l'analyse des retours seront lancées.",
+    "start": "Lancer",
+    "jobs": {
+      "analysis": "Extraction des exigences",
+      "indexing": "Indexation des connaissances",
+      "feedback": "Extraction des retours",
+      "draft_all": "Rédaction automatique"
+    }
+  },
+  "documents": {
+    "types": {
+      "rfp": "Appel d'offres",
+      "past_submission": "Soumission précédente",
+      "reference": "Document de référence",
+      "analysis_report": "Rapport d'analyse",
+      "template": "Modèle Word"
+    }
+  },
+  "drafting": {
+    "requirements": "Exigences",
+    "section": "Section",
+    "title": "Titre",
+    "type": "Type",
+    "status": "Statut",
+    "draftAll": "Rédiger tout",
+    "draft": "Rédiger",
+    "responsePlaceholder": "La réponse apparaîtra ici...",
+    "feedback": "Retours associés",
+    "statuses": {
+      "pending": "En attente",
+      "drafted": "Rédigé",
+      "reviewed": "Revu",
+      "final": "Final"
+    }
+  },
+  "review": {
+    "responded": "Répondues",
+    "finalized": "Finalisées",
+    "qualityScore": "Score qualité",
+    "checkCompliance": "Vérifier la conformité",
+    "exportDocx": "Exporter DOCX",
+    "complianceReport": "Rapport de conformité",
+    "coverage": "Couverture",
+    "warnings": "Avertissements"
+  },
+  "chat": {
+    "title": "Assistant",
+    "placeholder": "Poser une question..."
+  },
+  "settings": {
+    "title": "Paramètres",
+    "models": "Modèles IA par opération",
+    "prompts": "Prompts personnalisés",
+    "promptPlaceholder": "Entrez un prompt personnalisé pour remplacer le prompt système par défaut...",
+    "operations": {
+      "analysis": "Analyse",
+      "drafting": "Rédaction",
+      "feedback": "Retours",
+      "compliance": "Conformité",
+      "chat": "Chat"
+    }
+  },
+  "errors": {
+    "http": {
+      "generic": "Une erreur est survenue",
+      "unauthorized": "Non autorisé",
+      "forbidden": "Accès interdit",
+      "notFound": "Ressource non trouvée",
+      "serverError": "Erreur serveur",
+      "serviceUnavailable": "Service indisponible"
+    }
+  }
+}

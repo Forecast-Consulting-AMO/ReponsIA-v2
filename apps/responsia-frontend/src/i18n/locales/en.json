@@ -1,0 +1,128 @@
+{
+  "common": {
+    "appName": "ReponsIA",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "search": "Search",
+    "create": "Create"
+  },
+  "nav": {
+    "home": "Home",
+    "settings": "Settings",
+    "logout": "Log out"
+  },
+  "auth": {
+    "login": "Log in",
+    "subtitle": "Respond to RFPs with AI"
+  },
+  "dashboard": {
+    "title": "My Projects",
+    "newProject": "New Project",
+    "noProjects": "No projects yet. Create one to get started.",
+    "noDescription": "No description",
+    "search": "Search projects...",
+    "createProject": "Create a Project",
+    "confirmDelete": "Are you sure you want to delete this project?"
+  },
+  "project": {
+    "name": "Project name",
+    "description": "Description",
+    "notFound": "Project not found",
+    "status": {
+      "draft": "Draft",
+      "in_progress": "In progress",
+      "completed": "Completed"
+    },
+    "setup": {
+      "title": "Setup"
+    },
+    "drafting": {
+      "title": "Drafting"
+    },
+    "review": {
+      "title": "Review & Export"
+    }
+  },
+  "setup": {
+    "uploadTitle": "Project Documents",
+    "upload": "Upload",
+    "startAnalysis": "Start Analysis",
+    "confirmTitle": "Start Analysis?",
+    "confirmMessage": "{{count}} document(s) will be analyzed by AI. Requirement extraction, knowledge indexing, and feedback analysis will be launched.",
+    "start": "Start",
+    "jobs": {
+      "analysis": "Requirement extraction",
+      "indexing": "Knowledge indexing",
+      "feedback": "Feedback extraction",
+      "draft_all": "Auto-drafting"
+    }
+  },
+  "documents": {
+    "types": {
+      "rfp": "RFP Document",
+      "past_submission": "Past Submission",
+      "reference": "Reference Document",
+      "analysis_report": "Analysis Report",
+      "template": "Word Template"
+    }
+  },
+  "drafting": {
+    "requirements": "Requirements",
+    "section": "Section",
+    "title": "Title",
+    "type": "Type",
+    "status": "Status",
+    "draftAll": "Draft All",
+    "draft": "Draft",
+    "responsePlaceholder": "Response will appear here...",
+    "feedback": "Matched Feedback",
+    "statuses": {
+      "pending": "Pending",
+      "drafted": "Drafted",
+      "reviewed": "Reviewed",
+      "final": "Final"
+    }
+  },
+  "review": {
+    "responded": "Responded",
+    "finalized": "Finalized",
+    "qualityScore": "Quality Score",
+    "checkCompliance": "Check Compliance",
+    "exportDocx": "Export DOCX",
+    "complianceReport": "Compliance Report",
+    "coverage": "Coverage",
+    "warnings": "Warnings"
+  },
+  "chat": {
+    "title": "Assistant",
+    "placeholder": "Ask a question..."
+  },
+  "settings": {
+    "title": "Settings",
+    "models": "AI Models per Operation",
+    "prompts": "Custom Prompts",
+    "promptPlaceholder": "Enter a custom prompt to override the default system prompt...",
+    "operations": {
+      "analysis": "Analysis",
+      "drafting": "Drafting",
+      "feedback": "Feedback",
+      "compliance": "Compliance",
+      "chat": "Chat"
+    }
+  },
+  "errors": {
+    "http": {
+      "generic": "An error occurred",
+      "unauthorized": "Unauthorized",
+      "forbidden": "Access forbidden",
+      "notFound": "Resource not found",
+      "serverError": "Server error",
+      "serviceUnavailable": "Service unavailable"
+    }
+  }
+}

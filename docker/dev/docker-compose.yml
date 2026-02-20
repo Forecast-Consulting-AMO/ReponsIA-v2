@@ -1,13 +1,13 @@
-name: app-dev
+name: responsia-dev
 
 services:
   postgres:
-    image: postgres:15-alpine
+    image: pgvector/pgvector:pg16
     restart: unless-stopped
     ports:
       - '5433:5432'
     environment:
-      POSTGRES_DB: app_dev
+      POSTGRES_DB: responsia
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     volumes:
@@ -17,6 +17,15 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    restart: unless-stopped
+    ports:
+      - '10000:10000'
+      - '10001:10001'
+      - '10002:10002'
+    command: azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0 --skipApiVersionCheck
 
   pgadmin:
     image: dpage/pgadmin4:latest

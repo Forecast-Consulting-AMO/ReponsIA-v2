@@ -5,12 +5,12 @@ const config = {
       target: process.env.OPENAPI_URL || 'http://localhost:3000/api/docs-json',
     },
     output: {
-      target: 'apps/app-frontend/src/api/api.ts',
+      target: 'apps/responsia-frontend/src/api/api.ts',
       client: 'react-query',
       mode: 'single',
       override: {
         mutator: {
-          path: 'apps/app-frontend/src/api/mutator.ts',
+          path: 'apps/responsia-frontend/src/api/mutator.ts',
           name: 'customInstance',
         },
         query: {

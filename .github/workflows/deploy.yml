@@ -27,6 +27,11 @@ jobs:
       - run: npx nx build responsia-backend --configuration=production
       - run: npx nx build responsia-frontend --configuration=production
 
+      # Move frontend output to expected location (vite outputs to apps/responsia-frontend/dist/)
+      - run: |
+          mkdir -p dist/apps/responsia-frontend
+          cp -r apps/responsia-frontend/dist/* dist/apps/responsia-frontend/
+
       # Login to Azure Container Registry
       - uses: azure/docker-login@v2
         with:

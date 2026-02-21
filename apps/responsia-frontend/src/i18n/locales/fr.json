@@ -105,8 +105,11 @@
   "settings": {
     "title": "Paramètres",
     "models": "Modèles IA par opération",
-    "prompts": "Prompts personnalisés",
-    "promptPlaceholder": "Entrez un prompt personnalisé pour remplacer le prompt système par défaut...",
+    "prompts": "Prompts système",
+    "defaultPrompt": "Prompt par défaut",
+    "customPrompt": "Prompt personnalisé (remplace le défaut)",
+    "customized": "Personnalisé",
+    "promptPlaceholder": "Laisser vide pour utiliser le prompt par défaut...",
     "operations": {
       "analysis": "Analyse",
       "drafting": "Rédaction",

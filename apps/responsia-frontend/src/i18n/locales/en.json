@@ -105,8 +105,11 @@
   "settings": {
     "title": "Settings",
     "models": "AI Models per Operation",
-    "prompts": "Custom Prompts",
-    "promptPlaceholder": "Enter a custom prompt to override the default system prompt...",
+    "prompts": "System Prompts",
+    "defaultPrompt": "Default Prompt",
+    "customPrompt": "Custom Prompt (overrides default)",
+    "customized": "Customized",
+    "promptPlaceholder": "Leave empty to use the default prompt...",
     "operations": {
       "analysis": "Analysis",
       "drafting": "Drafting",

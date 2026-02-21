@@ -32,7 +32,8 @@ export class SettingsService {
     const profile = await this.profileRepo.findOne({ where: { auth0Id } })
     return {
       models: profile?.defaultModels ?? DEFAULT_MODELS,
-      prompts: profile?.defaultPrompts ?? PROMPTS,
+      prompts: profile?.defaultPrompts ?? {},
+      defaultPrompts: PROMPTS,
     }
   }
 

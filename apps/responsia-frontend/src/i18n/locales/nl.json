@@ -105,8 +105,11 @@
   "settings": {
     "title": "Instellingen",
     "models": "AI-modellen per bewerking",
-    "prompts": "Aangepaste prompts",
-    "promptPlaceholder": "Voer een aangepaste prompt in om de standaard systeemprompt te overschrijven...",
+    "prompts": "Systeemprompts",
+    "defaultPrompt": "Standaard prompt",
+    "customPrompt": "Aangepaste prompt (vervangt standaard)",
+    "customized": "Aangepast",
+    "promptPlaceholder": "Laat leeg om de standaard prompt te gebruiken...",
     "operations": {
       "analysis": "Analyse",
       "drafting": "Redactie",

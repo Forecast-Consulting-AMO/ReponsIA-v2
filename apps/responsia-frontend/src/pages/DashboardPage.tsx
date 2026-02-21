@@ -48,14 +48,19 @@ export const DashboardPage = () => {
 
   const handleCreate = async () => {
     if (!newName.trim()) return
-    const project = await createProject.mutateAsync({
-      name: newName.trim(),
-      description: newDesc.trim() || undefined,
-    })
-    setDialogOpen(false)
-    setNewName('')
-    setNewDesc('')
-    navigate(`/projects/${project.id}`)
+    try {
+      const project = await createProject.mutateAsync({
+        name: newName.trim(),
+        description: newDesc.trim() || undefined,
+      })
+      setDialogOpen(false)
+      setNewName('')
+      setNewDesc('')
+      navigate(`/projects/${project.id}`)
+    } catch (err: any) {
+      console.error('Failed to create project:', err)
+      alert(err?.response?.data?.message || err?.message || 'Failed to create project')
+    }
   }
 
   if (isLoading) {

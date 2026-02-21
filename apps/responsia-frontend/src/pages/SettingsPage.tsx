@@ -13,6 +13,7 @@ import {
   AccordionSummary,
   AccordionDetails,
   CircularProgress,
+  Chip,
 } from '@mui/material'
 import { ChevronDown, Save } from 'lucide-react'
 import { useModels, usePreferences, useUpdatePreferences } from '../hooks/useApi'
@@ -48,6 +49,7 @@ export const SettingsPage = () => {
   }
 
   const availableModels = modelsData?.models || []
+  const defaultPrompts: Record<string, string> = prefsData?.defaultPrompts || {}
 
   return (
     <Box sx={{ maxWidth: 800, mx: 'auto' }}>
@@ -81,22 +83,53 @@ export const SettingsPage = () => {
         </CardContent>
       </Card>
 
-      {/* Custom prompts per operation */}
+      {/* Prompts per operation */}
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Typography variant="h6" gutterBottom>
             {t('settings.prompts')}
           </Typography>
           {OPERATIONS.map((op) => (
-            <Accordion key={op}>
+            <Accordion key={op} defaultExpanded>
               <AccordionSummary expandIcon={<ChevronDown size={18} strokeWidth={1} />}>
-                <Typography>{t(`settings.operations.${op}`)}</Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <Typography>{t(`settings.operations.${op}`)}</Typography>
+                  {prompts[op] && (
+                    <Chip label={t('settings.customized')} size="small" color="primary" variant="outlined" />
+                  )}
+                </Box>
               </AccordionSummary>
               <AccordionDetails>
+                {/* Default system prompt — always visible */}
+                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
+                  {t('settings.defaultPrompt')}
+                </Typography>
+                <Box
+                  sx={{
+                    p: 1.5,
+                    mb: 2,
+                    bgcolor: 'action.hover',
+                    borderRadius: 1,
+                    border: '1px solid',
+                    borderColor: 'divider',
+                    whiteSpace: 'pre-wrap',
+                    fontSize: '0.85rem',
+                    fontFamily: 'monospace',
+                    maxHeight: 200,
+                    overflow: 'auto',
+                  }}
+                >
+                  {defaultPrompts[op] || '—'}
+                </Box>
+
+                {/* Custom override */}
+                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 0.5 }}>
+                  {t('settings.customPrompt')}
+                </Typography>
                 <TextField
                   multiline
-                  minRows={4}
-                  maxRows={12}
+                  minRows={3}
+                  maxRows={10}
                   fullWidth
                   value={prompts[op] || ''}
                   onChange={(e) => setPrompts((prev) => ({ ...prev, [op]: e.target.value }))}

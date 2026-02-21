@@ -7,6 +7,7 @@ import { QUEUE_SERVICE, QueueService } from '../jobs/queue.interface'
 import { AnalysisProcessor } from './processors/analysis.processor'
 import { IndexingProcessor } from './processors/indexing.processor'
 import { FeedbackProcessor } from './processors/feedback.processor'
+import { DraftAllProcessor } from './processors/draft-all.processor'
 
 @Injectable()
 export class SetupService {
@@ -20,6 +21,7 @@ export class SetupService {
     private analysisProcessor: AnalysisProcessor,
     private indexingProcessor: IndexingProcessor,
     private feedbackProcessor: FeedbackProcessor,
+    private draftAllProcessor: DraftAllProcessor,
   ) {
     // Register queue handlers
     this.queueService.register('setup-pipeline', async (payload) => {
@@ -33,6 +35,9 @@ export class SetupService {
     })
     this.queueService.register('feedback', async (payload) => {
       await this.feedbackProcessor.process(payload.projectId as number)
+    })
+    this.queueService.register('draft-all', async (payload) => {
+      await this.draftAllProcessor.process(payload.projectId as number)
     })
   }
 

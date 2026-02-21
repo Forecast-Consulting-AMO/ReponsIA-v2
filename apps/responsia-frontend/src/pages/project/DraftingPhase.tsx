@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Box,
@@ -12,9 +12,11 @@ import {
   IconButton,
   Divider,
   Paper,
+  CircularProgress,
+  InputAdornment,
 } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import { MessageSquare, Wand2, Send } from 'lucide-react'
+import { MessageSquare, Wand2, Send, Search } from 'lucide-react'
 import { useRequirements, useUpdateRequirement, useFeedback, useChatHistory } from '../../hooks/useApi'
 import { useSSE } from '../../hooks/useSSE'
 
@@ -44,6 +46,47 @@ export const DraftingPhase = ({ projectId }: Props) => {
   const [chatMessages, setChatMessages] = useState<{ role: string; content: string }[]>([])
   const chatSSE = useSSE()
 
+  // --- Search / Filter ---
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState<string | null>(null)
+
+  const filteredRequirements = (requirements || []).filter((r: any) => {
+    const matchesSearch = !searchTerm ||
+      r.sectionNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      r.sectionTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      r.requirementText?.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesStatus = !statusFilter || r.responseStatus === statusFilter
+    return matchesSearch && matchesStatus
+  })
+
+  // --- Bulk selection ---
+  const [selectedIds, setSelectedIds] = useState<number[]>([])
+
+  // --- Chat edit diff ---
+  const [editDiff, setEditDiff] = useState<{ old: string; new: string; requirementId: number } | null>(null)
+
+  // --- Autosave with debounce ---
+  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const debouncedSave = useCallback((id: number, text: string) => {
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+    saveTimeoutRef.current = setTimeout(() => {
+      updateReq.mutate({ id, responseText: text })
+    }, 1500)
+  }, [updateReq])
+
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current)
+    }
+  }, [])
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newText = e.target.value
+    setEditText(newText)
+    if (selected) debouncedSave(selected.id, newText)
+  }
+
   // Select a requirement
   const handleSelect = (req: any) => {
     setSelected(req)
@@ -69,6 +112,13 @@ export const DraftingPhase = ({ projectId }: Props) => {
     refetchReqs()
   }
 
+  // Detect edit intent in chat message
+  const isEditIntent = (msg: string) => {
+    const editKeywords = ['section', 'modifier', 'réécrire', 'rewrite', 'edit']
+    const lower = msg.toLowerCase()
+    return editKeywords.some((kw) => lower.includes(kw))
+  }
+
   // Send chat message
   const handleSendChat = async () => {
     if (!chatInput.trim()) return
@@ -76,12 +126,32 @@ export const DraftingPhase = ({ projectId }: Props) => {
     setChatInput('')
     setChatMessages((prev) => [...prev, { role: 'user', content: msg }])
 
-    chatSSE.startStream(`/api/v1/projects/${projectId}/chat`, { message: msg }, {
-      onDone: () => {
-        setChatMessages((prev) => [...prev, { role: 'assistant', content: chatSSE.streamedText }])
-        refetchChat()
-      },
-    })
+    // If this looks like an edit request and we have a selected requirement, use the edit endpoint
+    if (selected && isEditIntent(msg)) {
+      chatSSE.startStream(`/api/v1/projects/${projectId}/chat/edit`, {
+        requirementId: selected.id,
+        instruction: msg,
+      }, {
+        onDone: (data: any) => {
+          if (data?.diff) {
+            setEditDiff({
+              old: data.diff.old || selected.responseText || '',
+              new: data.diff.new || '',
+              requirementId: selected.id,
+            })
+          }
+          setChatMessages((prev) => [...prev, { role: 'assistant', content: chatSSE.streamedText || data?.text || '' }])
+          refetchChat()
+        },
+      })
+    } else {
+      chatSSE.startStream(`/api/v1/projects/${projectId}/chat`, { message: msg }, {
+        onDone: () => {
+          setChatMessages((prev) => [...prev, { role: 'assistant', content: chatSSE.streamedText }])
+          refetchChat()
+        },
+      })
+    }
   }
 
   const columns: GridColDef[] = [
@@ -130,10 +200,57 @@ export const DraftingPhase = ({ projectId }: Props) => {
             {t('drafting.draftAll')}
           </Button>
         </Box>
+
+        {/* Search and filter chips */}
+        <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
+          <TextField
+            size="small"
+            placeholder={t('common.search')}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{ minWidth: 200 }}
+            InputProps={{
+              startAdornment: <InputAdornment position="start"><Search size={16} strokeWidth={1} /></InputAdornment>,
+            }}
+          />
+          {(['pending', 'drafted', 'reviewed', 'final'] as const).map(status => (
+            <Chip
+              key={status}
+              label={t(`drafting.statuses.${status}`)}
+              variant={statusFilter === status ? 'filled' : 'outlined'}
+              color={STATUS_COLORS[status] || 'default'}
+              onClick={() => setStatusFilter(statusFilter === status ? null : status)}
+              size="small"
+            />
+          ))}
+        </Box>
+
+        {/* Bulk action bar */}
+        {selectedIds.length > 0 && (
+          <Box sx={{ display: 'flex', gap: 1, mb: 1, p: 1, bgcolor: 'action.selected', borderRadius: 1 }}>
+            <Typography variant="body2" sx={{ alignSelf: 'center', mr: 1 }}>
+              {selectedIds.length} {t('drafting.selected')}
+            </Typography>
+            {(['drafted', 'reviewed', 'final'] as const).map(status => (
+              <Button key={status} size="small" variant="outlined" onClick={async () => {
+                for (const id of selectedIds) {
+                  await updateReq.mutateAsync({ id, responseStatus: status })
+                }
+                setSelectedIds([])
+                refetchReqs()
+              }}>
+                &rarr; {t(`drafting.statuses.${status}`)}
+              </Button>
+            ))}
+          </Box>
+        )}
+
         <DataGrid
-          rows={requirements || []}
+          rows={filteredRequirements}
           columns={columns}
           onRowClick={(params) => handleSelect(params.row)}
+          checkboxSelection
+          onRowSelectionModelChange={(model) => setSelectedIds(Array.from(model.ids) as number[])}
           autoHeight
           density="compact"
           disableRowSelectionOnClick
@@ -177,10 +294,25 @@ export const DraftingPhase = ({ projectId }: Props) => {
                 maxRows={20}
                 fullWidth
                 value={isStreaming ? streamedText : editText}
-                onChange={(e) => setEditText(e.target.value)}
+                onChange={handleTextChange}
                 disabled={isStreaming}
                 placeholder={t('drafting.responsePlaceholder')}
               />
+
+              {/* Streaming indicator */}
+              {isStreaming && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 1 }}>
+                  <CircularProgress size={14} />
+                  <Typography variant="caption" color="text.secondary">{t('drafting.generating')}</Typography>
+                </Box>
+              )}
+
+              {/* Autosaved indicator */}
+              {updateReq.isSuccess && (
+                <Typography variant="caption" color="success.main" sx={{ mt: 0.5 }}>
+                  {t('drafting.autosaved')}
+                </Typography>
+              )}
 
               {/* Matched feedback */}
               {matchedFeedback.length > 0 && (
@@ -232,12 +364,44 @@ export const DraftingPhase = ({ projectId }: Props) => {
               <Typography variant="body2">{msg.content}</Typography>
             </Box>
           ))}
+          {/* Typing indicator */}
           {chatSSE.isStreaming && (
-            <Box sx={{ p: 1, borderRadius: 1, bgcolor: 'grey.100' }}>
-              <Typography variant="body2">{chatSSE.streamedText}</Typography>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1, borderRadius: 1, bgcolor: 'grey.100' }}>
+              <CircularProgress size={12} />
+              <Typography variant="body2">{chatSSE.streamedText || t('chat.thinking')}</Typography>
             </Box>
           )}
         </Box>
+
+        {/* Edit diff view */}
+        {editDiff && (
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="subtitle2" gutterBottom>{t('chat.editSuggestion')}</Typography>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Paper variant="outlined" sx={{ flex: 1, p: 1, bgcolor: 'error.light', opacity: 0.2 }}>
+                <Typography variant="caption" fontWeight={600}>{t('chat.current')}</Typography>
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{editDiff.old}</Typography>
+              </Paper>
+              <Paper variant="outlined" sx={{ flex: 1, p: 1, bgcolor: 'success.light', opacity: 0.2 }}>
+                <Typography variant="caption" fontWeight={600}>{t('chat.suggested')}</Typography>
+                <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>{editDiff.new}</Typography>
+              </Paper>
+            </Box>
+            <Box sx={{ display: 'flex', gap: 1, mt: 1 }}>
+              <Button size="small" variant="contained" color="success" onClick={() => {
+                updateReq.mutateAsync({ id: editDiff.requirementId, responseText: editDiff.new, responseStatus: 'reviewed' })
+                setEditText(editDiff.new)
+                setEditDiff(null)
+                refetchReqs()
+              }}>
+                {t('chat.accept')}
+              </Button>
+              <Button size="small" variant="outlined" onClick={() => setEditDiff(null)}>
+                {t('chat.reject')}
+              </Button>
+            </Box>
+          </Box>
+        )}
 
         <Box sx={{ display: 'flex', gap: 1 }}>
           <TextField

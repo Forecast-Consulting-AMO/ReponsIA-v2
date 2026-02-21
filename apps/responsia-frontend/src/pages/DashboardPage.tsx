@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useSnackbar } from 'notistack'
 import {
   Box,
   Button,
@@ -31,6 +32,7 @@ const STATUS_COLORS: Record<string, 'default' | 'warning' | 'success'> = {
 export const DashboardPage = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const { enqueueSnackbar } = useSnackbar()
   const { data: projects, isLoading } = useProjects()
   const createProject = useCreateProject()
   const deleteProject = useDeleteProject()
@@ -56,10 +58,11 @@ export const DashboardPage = () => {
       setDialogOpen(false)
       setNewName('')
       setNewDesc('')
+      enqueueSnackbar(t('dashboard.projectCreated', { name: newName.trim() }), { variant: 'success' })
       navigate(`/projects/${project.id}`)
     } catch (err: any) {
       console.error('Failed to create project:', err)
-      alert(err?.response?.data?.message || err?.message || 'Failed to create project')
+      enqueueSnackbar(err?.response?.data?.message || err?.message || t('errors.http.generic'), { variant: 'error' })
     }
   }
 

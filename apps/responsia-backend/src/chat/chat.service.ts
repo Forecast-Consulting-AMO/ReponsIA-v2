@@ -99,6 +99,11 @@ export class ChatService {
       .join('\n\n')
   }
 
+  /** Verify the caller has access to the project */
+  async verifyAccess(projectId: number, auth0Id: string): Promise<void> {
+    await this.projectsService.verifyAccess(projectId, auth0Id)
+  }
+
   /** Get a requirement's current response text for edit suggestions */
   async getRequirementText(requirementId: number): Promise<{ requirement: Requirement }> {
     const req = await this.requirementsRepo.findOne({ where: { id: requirementId } })

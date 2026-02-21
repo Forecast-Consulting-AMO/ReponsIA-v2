@@ -27,7 +27,8 @@
     "noDescription": "Pas de description",
     "search": "Rechercher un projet...",
     "createProject": "Créer un projet",
-    "confirmDelete": "Voulez-vous vraiment supprimer ce projet ?"
+    "confirmDelete": "Voulez-vous vraiment supprimer ce projet ?",
+    "projectCreated": "Projet « {{name}} » créé"
   },
   "project": {
     "name": "Nom du projet",
@@ -86,7 +87,10 @@
       "drafted": "Rédigé",
       "reviewed": "Revu",
       "final": "Final"
-    }
+    },
+    "selected": "sélectionnée(s)",
+    "autosaved": "Enregistré automatiquement",
+    "generating": "Rédaction en cours..."
   },
   "review": {
     "responded": "Répondues",
@@ -96,11 +100,18 @@
     "exportDocx": "Exporter DOCX",
     "complianceReport": "Rapport de conformité",
     "coverage": "Couverture",
-    "warnings": "Avertissements"
+    "warnings": "Avertissements",
+    "exportTemplate": "Exporter avec modèle"
   },
   "chat": {
     "title": "Assistant",
-    "placeholder": "Poser une question..."
+    "placeholder": "Poser une question...",
+    "editSuggestion": "Suggestion de modification",
+    "current": "Actuel",
+    "suggested": "Suggéré",
+    "accept": "Accepter",
+    "reject": "Rejeter",
+    "thinking": "Réflexion en cours..."
   },
   "settings": {
     "title": "Paramètres",
@@ -116,6 +127,25 @@
       "feedback": "Retours",
       "compliance": "Conformité",
       "chat": "Chat"
+    },
+    "contentLanguage": "Langue du contenu",
+    "projectModelHint": "Remplacez les modèles par défaut pour ce projet uniquement",
+    "useDefault": "Par défaut"
+  },
+  "members": {
+    "title": "Membres",
+    "invite": "Inviter",
+    "inviteTitle": "Inviter un membre",
+    "email": "Adresse e-mail",
+    "invited": "Membre invité",
+    "removed": "Membre retiré",
+    "confirmRemove": "Voulez-vous retirer ce membre ?",
+    "accepted": "Accepté",
+    "pending": "En attente",
+    "roles": {
+      "owner": "Propriétaire",
+      "editor": "Éditeur",
+      "viewer": "Lecteur"
     }
   },
   "errors": {

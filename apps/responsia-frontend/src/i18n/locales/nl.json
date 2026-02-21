@@ -27,7 +27,8 @@
     "noDescription": "Geen beschrijving",
     "search": "Projecten zoeken...",
     "createProject": "Project aanmaken",
-    "confirmDelete": "Weet u zeker dat u dit project wilt verwijderen?"
+    "confirmDelete": "Weet u zeker dat u dit project wilt verwijderen?",
+    "projectCreated": "Project \"{{name}}\" aangemaakt"
   },
   "project": {
     "name": "Projectnaam",
@@ -86,7 +87,10 @@
       "drafted": "Opgesteld",
       "reviewed": "Beoordeeld",
       "final": "Definitief"
-    }
+    },
+    "selected": "geselecteerd",
+    "autosaved": "Automatisch opgeslagen",
+    "generating": "Bezig met opstellen..."
   },
   "review": {
     "responded": "Beantwoord",
@@ -96,11 +100,18 @@
     "exportDocx": "DOCX exporteren",
     "complianceReport": "Conformiteitsrapport",
     "coverage": "Dekking",
-    "warnings": "Waarschuwingen"
+    "warnings": "Waarschuwingen",
+    "exportTemplate": "Exporteren met sjabloon"
   },
   "chat": {
     "title": "Assistent",
-    "placeholder": "Stel een vraag..."
+    "placeholder": "Stel een vraag...",
+    "editSuggestion": "Bewerkingssuggestie",
+    "current": "Huidig",
+    "suggested": "Voorgesteld",
+    "accept": "Accepteren",
+    "reject": "Afwijzen",
+    "thinking": "Aan het denken..."
   },
   "settings": {
     "title": "Instellingen",
@@ -116,6 +127,25 @@
       "feedback": "Feedback",
       "compliance": "Conformiteit",
       "chat": "Chat"
+    },
+    "contentLanguage": "Inhoudstaal",
+    "projectModelHint": "Overschrijf standaardmodellen alleen voor dit project",
+    "useDefault": "Standaard"
+  },
+  "members": {
+    "title": "Leden",
+    "invite": "Uitnodigen",
+    "inviteTitle": "Lid uitnodigen",
+    "email": "E-mailadres",
+    "invited": "Lid uitgenodigd",
+    "removed": "Lid verwijderd",
+    "confirmRemove": "Dit lid verwijderen?",
+    "accepted": "Geaccepteerd",
+    "pending": "In afwachting",
+    "roles": {
+      "owner": "Eigenaar",
+      "editor": "Bewerker",
+      "viewer": "Lezer"
     }
   },
   "errors": {

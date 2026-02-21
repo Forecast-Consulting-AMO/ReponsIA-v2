@@ -10,11 +10,13 @@ import {
   Tooltip,
   CircularProgress,
 } from '@mui/material'
-import { ArrowLeft, Upload, Pencil, ShieldCheck } from 'lucide-react'
+import { ArrowLeft, Upload, Pencil, ShieldCheck, Settings, Users } from 'lucide-react'
 import { useProject } from '../hooks/useApi'
 import { SetupPhase } from './project/SetupPhase'
 import { DraftingPhase } from './project/DraftingPhase'
 import { ReviewPhase } from './project/ReviewPhase'
+import { ProjectSettingsTab } from './project/ProjectSettingsTab'
+import { MembersTab } from './project/MembersTab'
 
 export const ProjectPage = () => {
   const { id } = useParams<{ id: string }>()
@@ -42,7 +44,6 @@ export const ProjectPage = () => {
 
   return (
     <Box>
-      {/* Header */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
         <Tooltip title={t('common.back')}>
           <IconButton onClick={() => navigate('/')}>
@@ -54,29 +55,19 @@ export const ProjectPage = () => {
         </Typography>
       </Box>
 
-      {/* Phase tabs */}
       <Tabs value={phase} onChange={(_, v) => setPhase(v)} sx={{ mb: 3 }}>
-        <Tab
-          icon={<Upload size={18} strokeWidth={1} />}
-          iconPosition="start"
-          label={t('project.setup.title')}
-        />
-        <Tab
-          icon={<Pencil size={18} strokeWidth={1} />}
-          iconPosition="start"
-          label={t('project.drafting.title')}
-        />
-        <Tab
-          icon={<ShieldCheck size={18} strokeWidth={1} />}
-          iconPosition="start"
-          label={t('project.review.title')}
-        />
+        <Tab icon={<Upload size={18} strokeWidth={1} />} iconPosition="start" label={t('project.setup.title')} />
+        <Tab icon={<Pencil size={18} strokeWidth={1} />} iconPosition="start" label={t('project.drafting.title')} />
+        <Tab icon={<ShieldCheck size={18} strokeWidth={1} />} iconPosition="start" label={t('project.review.title')} />
+        <Tab icon={<Users size={18} strokeWidth={1} />} iconPosition="start" label={t('members.title')} />
+        <Tab icon={<Settings size={18} strokeWidth={1} />} iconPosition="start" label={t('nav.settings')} />
       </Tabs>
 
-      {/* Phase content */}
       {phase === 0 && <SetupPhase projectId={projectId} />}
       {phase === 1 && <DraftingPhase projectId={projectId} />}
       {phase === 2 && <ReviewPhase projectId={projectId} />}
+      {phase === 3 && <MembersTab projectId={projectId} />}
+      {phase === 4 && <ProjectSettingsTab projectId={projectId} />}
     </Box>
   )
 }

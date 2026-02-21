@@ -27,7 +27,8 @@
     "noDescription": "No description",
     "search": "Search projects...",
     "createProject": "Create a Project",
-    "confirmDelete": "Are you sure you want to delete this project?"
+    "confirmDelete": "Are you sure you want to delete this project?",
+    "projectCreated": "Project \"{{name}}\" created"
   },
   "project": {
     "name": "Project name",
@@ -86,7 +87,10 @@
       "drafted": "Drafted",
       "reviewed": "Reviewed",
       "final": "Final"
-    }
+    },
+    "selected": "selected",
+    "autosaved": "Auto-saved",
+    "generating": "Generating draft..."
   },
   "review": {
     "responded": "Responded",
@@ -96,11 +100,18 @@
     "exportDocx": "Export DOCX",
     "complianceReport": "Compliance Report",
     "coverage": "Coverage",
-    "warnings": "Warnings"
+    "warnings": "Warnings",
+    "exportTemplate": "Export with Template"
   },
   "chat": {
     "title": "Assistant",
-    "placeholder": "Ask a question..."
+    "placeholder": "Ask a question...",
+    "editSuggestion": "Edit Suggestion",
+    "current": "Current",
+    "suggested": "Suggested",
+    "accept": "Accept",
+    "reject": "Reject",
+    "thinking": "Thinking..."
   },
   "settings": {
     "title": "Settings",
@@ -116,6 +127,25 @@
       "feedback": "Feedback",
       "compliance": "Compliance",
       "chat": "Chat"
+    },
+    "contentLanguage": "Content Language",
+    "projectModelHint": "Override default models for this project only",
+    "useDefault": "Default"
+  },
+  "members": {
+    "title": "Members",
+    "invite": "Invite",
+    "inviteTitle": "Invite a Member",
+    "email": "Email address",
+    "invited": "Member invited",
+    "removed": "Member removed",
+    "confirmRemove": "Remove this member?",
+    "accepted": "Accepted",
+    "pending": "Pending",
+    "roles": {
+      "owner": "Owner",
+      "editor": "Editor",
+      "viewer": "Viewer"
     }
   },
   "errors": {

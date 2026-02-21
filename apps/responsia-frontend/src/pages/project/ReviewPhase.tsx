@@ -14,7 +14,8 @@ import {
   Chip,
   Divider,
 } from '@mui/material'
-import { ShieldCheck, Download, AlertTriangle } from 'lucide-react'
+import { ShieldCheck, Download, AlertTriangle, FileUp } from 'lucide-react'
+import { useSnackbar } from 'notistack'
 import { useCompliance, useExport, useRequirements } from '../../hooks/useApi'
 
 interface Props {
@@ -23,6 +24,7 @@ interface Props {
 
 export const ReviewPhase = ({ projectId }: Props) => {
   const { t } = useTranslation()
+  const { enqueueSnackbar } = useSnackbar()
   const { data: requirements } = useRequirements(projectId)
   const complianceMutation = useCompliance(projectId)
   const exportMutation = useExport(projectId)
@@ -34,13 +36,31 @@ export const ReviewPhase = ({ projectId }: Props) => {
   }
 
   const handleExport = async () => {
-    const blob = await exportMutation.mutateAsync('clean')
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `reponse-ao-${projectId}.docx`
-    a.click()
-    URL.revokeObjectURL(url)
+    try {
+      const blob = await exportMutation.mutateAsync('clean')
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `reponse-ao-${projectId}.docx`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (err: any) {
+      enqueueSnackbar(err?.response?.data?.message || t('errors.http.generic'), { variant: 'error' })
+    }
+  }
+
+  const handleTemplateExport = async () => {
+    try {
+      const blob = await exportMutation.mutateAsync('template')
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `reponse-ao-${projectId}-template.docx`
+      a.click()
+      URL.revokeObjectURL(url)
+    } catch (err: any) {
+      enqueueSnackbar(err?.response?.data?.message || t('errors.http.generic'), { variant: 'error' })
+    }
   }
 
   // Quick stats
@@ -91,6 +111,14 @@ export const ReviewPhase = ({ projectId }: Props) => {
           disabled={exportMutation.isPending}
         >
           {t('review.exportDocx')}
+        </Button>
+        <Button
+          variant="outlined"
+          startIcon={<FileUp size={18} strokeWidth={1} />}
+          onClick={handleTemplateExport}
+          disabled={exportMutation.isPending}
+        >
+          {t('review.exportTemplate')}
         </Button>
       </Box>
 

@@ -166,6 +166,51 @@ export const useUpdatePreferences = () => {
   })
 }
 
+// --- Project Settings ---
+
+export const useProjectSettings = (projectId: number) =>
+  useQuery({
+    queryKey: ['projectSettings', projectId],
+    queryFn: () => customInstance<any>({ url: `/api/v1/projects/${projectId}/settings`, method: 'GET' }),
+    enabled: !!projectId,
+  })
+
+export const useUpdateProjectSettings = (projectId: number) => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { models?: Record<string, string>; prompts?: Record<string, string>; contentLanguage?: string }) =>
+      customInstance<any>({ url: `/api/v1/projects/${projectId}/settings`, method: 'PUT', data }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['projectSettings', projectId] }),
+  })
+}
+
+// --- Members ---
+
+export const useMembers = (projectId: number) =>
+  useQuery({
+    queryKey: ['members', projectId],
+    queryFn: () => customInstance<any[]>({ url: `/api/v1/projects/${projectId}/members`, method: 'GET' }),
+    enabled: !!projectId,
+  })
+
+export const useInviteMember = (projectId: number) => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { email: string; role: string }) =>
+      customInstance<any>({ url: `/api/v1/projects/${projectId}/members/invite`, method: 'POST', data }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['members', projectId] }),
+  })
+}
+
+export const useRemoveMember = (projectId: number) => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (memberId: number) =>
+      customInstance<any>({ url: `/api/v1/projects/${projectId}/members/${memberId}`, method: 'DELETE' }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['members', projectId] }),
+  })
+}
+
 // --- Auth ---
 
 export const useMe = () =>

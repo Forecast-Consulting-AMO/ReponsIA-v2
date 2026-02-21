@@ -27,8 +27,9 @@ export class ExportController {
     @Body() body: { format?: 'clean' | 'template' },
     @Res() res: Response,
   ) {
-    // Template-based export will be added later
-    const buffer = await this.exportService.exportClean(pid, user.sub)
+    const buffer = body.format === 'template'
+      ? await this.exportService.exportTemplate(pid, user.sub)
+      : await this.exportService.exportClean(pid, user.sub)
 
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document')
     res.setHeader('Content-Disposition', `attachment; filename="reponse-ao-${pid}.docx"`)

@@ -15,6 +15,7 @@ export interface StreamCallbacks {
   onToken: (token: string) => void
   onDone: (fullText: string) => void
   onError: (error: Error) => void
+  signal?: AbortSignal
 }
 
 @Injectable()
@@ -115,6 +116,7 @@ export class AiService {
     callbacks: StreamCallbacks,
   ): Promise<void> {
     let fullText = ''
+    const signal = callbacks.signal
 
     try {
       if (model.provider === 'anthropic') {
@@ -125,7 +127,14 @@ export class AiService {
           system: systemPrompt,
           messages: [{ role: 'user', content: userPrompt }],
         })
+
+        // Abort the Anthropic stream if the client disconnects
+        if (signal) {
+          signal.addEventListener('abort', () => stream.controller.abort(), { once: true })
+        }
+
         for await (const event of stream) {
+          if (signal?.aborted) break
           if (
             event.type === 'content_block_delta' &&
             event.delta.type === 'text_delta'
@@ -146,6 +155,7 @@ export class AiService {
           ],
         })
         for await (const chunk of stream) {
+          if (signal?.aborted) break
           const token = chunk.choices[0]?.delta?.content
           if (token) {
             fullText += token
@@ -155,6 +165,11 @@ export class AiService {
       }
       callbacks.onDone(fullText)
     } catch (err) {
+      // If aborted, treat as a clean stop rather than error
+      if (signal?.aborted) {
+        callbacks.onDone(fullText)
+        return
+      }
       callbacks.onError(err instanceof Error ? err : new Error(String(err)))
     }
   }

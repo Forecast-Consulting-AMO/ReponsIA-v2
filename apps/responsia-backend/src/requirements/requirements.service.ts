@@ -42,10 +42,17 @@ export class RequirementsService {
     return req
   }
 
-  async update(id: number, dto: UpdateRequirementDto): Promise<Requirement> {
+  async update(id: number, dto: UpdateRequirementDto, auth0Id: string): Promise<Requirement> {
     const req = await this.findOne(id)
+    await this.projectsService.verifyAccess(req.projectId, auth0Id)
     Object.assign(req, dto)
     return this.requirementsRepo.save(req)
+  }
+
+  /** Verify access by looking up the requirement's project */
+  async verifyAccessByRequirement(requirementId: number, auth0Id: string): Promise<void> {
+    const req = await this.findOne(requirementId)
+    await this.projectsService.verifyAccess(req.projectId, auth0Id)
   }
 
   async saveResponse(id: number, responseText: string): Promise<void> {

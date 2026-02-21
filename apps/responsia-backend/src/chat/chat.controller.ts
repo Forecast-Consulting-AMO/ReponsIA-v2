@@ -6,9 +6,10 @@ import {
   Body,
   ParseIntPipe,
   UseGuards,
+  Req,
   Res,
 } from '@nestjs/common'
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 import { CurrentUser } from '../auth/decorators/current-user.decorator'
@@ -40,11 +41,17 @@ export class ChatController {
     @Param('pid', ParseIntPipe) pid: number,
     @CurrentUser() user: { sub: string },
     @Body() dto: SendMessageDto,
+    @Req() req: Request,
     @Res() res: Response,
   ) {
+    await this.chatService.verifyAccess(pid, user.sub)
+
     res.setHeader('Content-Type', 'text/event-stream')
     res.setHeader('Cache-Control', 'no-cache')
     res.setHeader('Connection', 'keep-alive')
+
+    const abortController = new AbortController()
+    req.on('close', () => abortController.abort())
 
     await this.chatService.saveUserMessage(pid, user.sub, dto.message)
 
@@ -70,6 +77,7 @@ export class ChatController {
         res.write(`data: ${JSON.stringify({ type: 'error', message: error.message })}\n\n`)
         res.end()
       },
+      signal: abortController.signal,
     })
   }
 
@@ -79,11 +87,17 @@ export class ChatController {
     @Param('pid', ParseIntPipe) pid: number,
     @CurrentUser() user: { sub: string },
     @Body() dto: EditSuggestionDto,
+    @Req() req: Request,
     @Res() res: Response,
   ) {
+    await this.chatService.verifyAccess(pid, user.sub)
+
     res.setHeader('Content-Type', 'text/event-stream')
     res.setHeader('Cache-Control', 'no-cache')
     res.setHeader('Connection', 'keep-alive')
+
+    const abortController = new AbortController()
+    req.on('close', () => abortController.abort())
 
     const { requirement } = await this.chatService.getRequirementText(dto.requirementId)
     const currentText = requirement.responseText || ''
@@ -123,6 +137,7 @@ Réécrivez la réponse en appliquant la modification demandée. Retournez UNIQU
         res.write(`data: ${JSON.stringify({ type: 'error', message: error.message })}\n\n`)
         res.end()
       },
+      signal: abortController.signal,
     })
   }
 }

@@ -7,9 +7,10 @@ import {
   Body,
   ParseIntPipe,
   UseGuards,
+  Req,
   Res,
 } from '@nestjs/common'
-import { Response } from 'express'
+import { Request, Response } from 'express'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 import { CurrentUser } from '../auth/decorators/current-user.decorator'
@@ -39,19 +40,27 @@ export class RequirementsController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateRequirementDto,
+    @CurrentUser() user: { sub: string },
   ) {
-    return this.requirementsService.update(id, dto)
+    return this.requirementsService.update(id, dto, user.sub)
   }
 
   /** SSE endpoint: stream a draft response for a single requirement */
   @Get('requirements/:id/draft')
   async draft(
     @Param('id', ParseIntPipe) id: number,
+    @CurrentUser() user: { sub: string },
+    @Req() req: Request,
     @Res() res: Response,
   ) {
+    await this.requirementsService.verifyAccessByRequirement(id, user.sub)
+
     res.setHeader('Content-Type', 'text/event-stream')
     res.setHeader('Cache-Control', 'no-cache')
     res.setHeader('Connection', 'keep-alive')
+
+    const abortController = new AbortController()
+    req.on('close', () => abortController.abort())
 
     const requirement = await this.requirementsService.findOne(id)
 
@@ -94,6 +103,7 @@ export class RequirementsController {
           )
           res.end()
         },
+        signal: abortController.signal,
       },
     )
   }

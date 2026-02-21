@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import {
@@ -11,7 +11,9 @@ import {
 } from 'docx'
 import { Requirement } from '../database/entities/requirement.entity'
 import { Project } from '../database/entities/project.entity'
+import { Document as DocumentEntity } from '../database/entities/document.entity'
 import { ProjectsService } from '../projects/projects.service'
+import { StorageService } from '../storage/storage.service'
 
 @Injectable()
 export class ExportService {
@@ -22,7 +24,10 @@ export class ExportService {
     private requirementsRepo: Repository<Requirement>,
     @InjectRepository(Project)
     private projectsRepo: Repository<Project>,
+    @InjectRepository(DocumentEntity)
+    private documentsRepo: Repository<DocumentEntity>,
     private projectsService: ProjectsService,
+    private storageService: StorageService,
   ) {}
 
   /** Generate a clean structured DOCX export */
@@ -151,5 +156,66 @@ export class ExportService {
     })
 
     return Buffer.from(await Packer.toBuffer(doc))
+  }
+
+  /** Generate a DOCX export based on an uploaded template with placeholder replacement */
+  async exportTemplate(projectId: number, auth0Id: string): Promise<Buffer> {
+    await this.projectsService.verifyAccess(projectId, auth0Id)
+
+    const project = await this.projectsRepo.findOneOrFail({ where: { id: projectId } })
+    const requirements = await this.requirementsRepo.find({
+      where: { projectId },
+      order: { sectionNumber: 'ASC' },
+    })
+
+    const templateDoc = await this.documentsRepo.findOne({
+      where: { projectId, fileType: 'template' },
+    })
+    if (!templateDoc?.blobName) {
+      throw new NotFoundException('Aucun modèle Word importé pour ce projet')
+    }
+
+    const templateBuffer = await this.storageService.download(templateDoc.blobName)
+
+    // Simple placeholder replacement in the DOCX XML
+    const JSZip = (await import('jszip')).default
+    const zip = await JSZip.loadAsync(templateBuffer)
+    const xmlFile = zip.file('word/document.xml')
+    if (!xmlFile) throw new Error('Invalid DOCX template')
+
+    let xml = await xmlFile.async('string')
+
+    // Replace known placeholders
+    xml = xml.replace(/\{\{PROJECT_NAME\}\}/g, this.escapeXml(project.name))
+    xml = xml.replace(/\{\{PROJECT_DESCRIPTION\}\}/g, this.escapeXml(project.description || ''))
+    xml = xml.replace(/\{\{DATE\}\}/g, new Date().toLocaleDateString('fr-FR'))
+
+    // Replace section-specific placeholders: {{SECTION_3_1_2}} etc.
+    for (const req of requirements) {
+      const key = `SECTION_${req.sectionNumber?.replace(/\./g, '_')}`
+      xml = xml.replace(
+        new RegExp(`\\{\\{${key}\\}\\}`, 'g'),
+        this.escapeXml(req.responseText || '[Non rédigé]'),
+      )
+    }
+
+    // Replace {{REQUIREMENTS_TABLE}} with a formatted list of all requirements+responses
+    const reqTable = requirements
+      .map((r) => `${r.sectionNumber} - ${r.sectionTitle}\n${r.responseText || '[Non rédigé]'}`)
+      .join('\n\n')
+    xml = xml.replace(/\{\{REQUIREMENTS_TABLE\}\}/g, this.escapeXml(reqTable))
+
+    zip.file('word/document.xml', xml)
+    const output = await zip.generateAsync({ type: 'nodebuffer' })
+    return Buffer.from(output)
+  }
+
+  private escapeXml(str: string): string {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;')
   }
 }

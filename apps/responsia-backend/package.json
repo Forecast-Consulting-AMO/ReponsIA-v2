@@ -8,6 +8,11 @@
     "migration:run": "typeorm-ts-node-commonjs migration:run -d src/data-source.ts",
     "migration:revert": "typeorm-ts-node-commonjs migration:revert -d src/data-source.ts"
   },
+  "dependencies": {
+    "pg": "^8.16.3",
+    "multer": "^1.4.5-lts.2",
+    "jsonwebtoken": "^9.0.2"
+  },
   "nx": {
     "targets": {
       "build": {

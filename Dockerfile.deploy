@@ -1,0 +1,43 @@
+FROM node:22-alpine AS builder
+
+WORKDIR /workspace
+
+# Copy package files first for dependency caching
+COPY package.json package-lock.json ./
+COPY apps/responsia-backend/package.json apps/responsia-backend/
+COPY apps/responsia-frontend/package.json apps/responsia-frontend/
+
+RUN npm ci --legacy-peer-deps
+
+# Copy all source files
+COPY . .
+
+# Build backend and frontend with Nx
+ENV NX_DAEMON=false
+RUN npx nx build responsia-backend --configuration=production --skip-nx-cache
+RUN npx nx build responsia-frontend --configuration=production --skip-nx-cache
+
+# Vite outputs to apps/responsia-frontend/dist/ — move to dist/apps/responsia-frontend/
+RUN if [ ! -d /workspace/dist/apps/responsia-frontend ]; then \
+      mkdir -p /workspace/dist/apps/responsia-frontend && \
+      cp -r /workspace/apps/responsia-frontend/dist/* /workspace/dist/apps/responsia-frontend/; \
+    fi
+
+# --- Production stage ---
+FROM node:lts-alpine
+
+RUN addgroup --system app && adduser --system --ingroup app app
+
+WORKDIR /app
+
+COPY --from=builder /workspace/dist/apps/responsia-backend/package*.json ./
+RUN npm install --omit=dev
+
+COPY --from=builder /workspace/dist/apps/responsia-backend/ .
+COPY --from=builder /workspace/dist/apps/responsia-frontend/ ./public/
+
+RUN chown -R app:app /app
+USER app
+
+EXPOSE 3000
+CMD ["node", "main.js"]

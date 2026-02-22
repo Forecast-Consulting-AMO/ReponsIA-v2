@@ -48,13 +48,15 @@ export const getApiErrorMessage = (error: unknown): string => {
 const getBaseUrl = (): string => {
   const env = import.meta.env as Record<string, string | undefined>;
   const baseUrl = env.VITE_API_URL;
-  if (!baseUrl || baseUrl.trim().length === 0) {
-    console.warn(
-      'VITE_API_URL is not set — API calls will target localhost:3000. Set it in .env for production.',
-    );
-    return 'http://localhost:3000';
+  if (baseUrl && baseUrl.trim().length > 0) {
+    return baseUrl;
   }
-  return baseUrl;
+  // In production, frontend is served by the same NestJS server — use relative URLs
+  if (import.meta.env.PROD) {
+    return '';
+  }
+  // In dev, NestJS runs on port 3000 while Vite runs on a different port
+  return 'http://localhost:3000';
 };
 
 export const AXIOS_INSTANCE = Axios.create({

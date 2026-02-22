@@ -68,7 +68,7 @@ export class IndexingProcessor {
         const chunks = this.splitIntoChunks(doc.extractedText)
 
         for (const chunk of chunks) {
-          const saved = await this.chunkRepo.save(
+          await this.chunkRepo.save(
             this.chunkRepo.create({
               projectId,
               documentId: doc.id,

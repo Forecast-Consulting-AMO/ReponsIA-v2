@@ -22,7 +22,7 @@ const RequireAuth = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/login" replace />
   }
 
-  return <>{children}</>
+  return children
 }
 
 export const AppRouter = () => {

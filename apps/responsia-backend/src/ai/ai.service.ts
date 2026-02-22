@@ -59,6 +59,7 @@ export class AiService {
       projectOverrides?.[operation] ??
       userDefaults?.[operation] ??
       DEFAULT_MODELS[operation]
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- default model always exists
     return getModelById(modelId) ?? getModelById(DEFAULT_MODELS[operation])!
   }
 

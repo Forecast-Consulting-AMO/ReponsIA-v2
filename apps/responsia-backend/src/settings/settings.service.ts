@@ -4,7 +4,7 @@ import { Repository } from 'typeorm'
 import { Profile } from '../database/entities/profile.entity'
 import { Project } from '../database/entities/project.entity'
 import { AiService } from '../ai/ai.service'
-import { AI_MODELS, DEFAULT_MODELS } from '../ai/ai.config'
+import { DEFAULT_MODELS } from '../ai/ai.config'
 import { PROMPTS } from '../ai/prompts'
 import { ProjectsService } from '../projects/projects.service'
 

@@ -21,6 +21,7 @@ export class ServiceBusQueueService
   private receivers: ServiceBusReceiver[] = []
 
   constructor(private config: ConfigService) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- validated by config schema
     const connStr = this.config.get<string>('AZURE_SERVICE_BUS_CONNECTION_STRING')!
     this.client = new ServiceBusClient(connStr)
   }

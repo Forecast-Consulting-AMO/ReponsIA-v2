@@ -1,5 +1,5 @@
-import { IsString, IsOptional, IsInt } from 'class-validator'
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import { IsString, IsInt } from 'class-validator'
+import { ApiProperty } from '@nestjs/swagger'
 
 export class SendMessageDto {
   @ApiProperty()

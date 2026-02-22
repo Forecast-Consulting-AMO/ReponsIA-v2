@@ -14,7 +14,7 @@ export const Auth0ProviderWithHistory = ({ children }: PropsWithChildren) => {
   };
 
   if (!domain || !clientId) {
-    return <>{children}</>;
+    return children;
   }
 
   return (

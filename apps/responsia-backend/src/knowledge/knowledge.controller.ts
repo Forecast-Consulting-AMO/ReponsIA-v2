@@ -6,7 +6,6 @@ import {
   Body,
   ParseIntPipe,
   UseGuards,
-  Query,
 } from '@nestjs/common'
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger'
 import { JwtAuthGuard } from '../auth/jwt-auth.guard'

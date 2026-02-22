@@ -49,7 +49,7 @@ export const MembersTab = ({ projectId }: Props) => {
   }
 
   const handleRemove = async (memberId: number) => {
-    if (!confirm(t('members.confirmRemove'))) return
+    if (!window.confirm(t('members.confirmRemove'))) return
     try {
       await removeMember.mutateAsync(memberId)
       enqueueSnackbar(t('members.removed'), { variant: 'success' })

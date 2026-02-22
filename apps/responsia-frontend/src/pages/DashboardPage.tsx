@@ -143,7 +143,7 @@ export const DashboardPage = () => {
                     size="small"
                     onClick={(e) => {
                       e.stopPropagation()
-                      if (confirm(t('dashboard.confirmDelete'))) {
+                      if (window.confirm(t('dashboard.confirmDelete'))) {
                         deleteProject.mutate(project.id)
                       }
                     }}

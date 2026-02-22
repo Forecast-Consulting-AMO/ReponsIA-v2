@@ -1,5 +1,4 @@
 import { Logger } from '@nestjs/common'
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const pdfParse = require('pdf-parse')
 
 const logger = new Logger('PdfReader')

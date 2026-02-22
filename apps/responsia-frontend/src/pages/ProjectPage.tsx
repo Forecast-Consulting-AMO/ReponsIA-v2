@@ -20,7 +20,7 @@ import { MembersTab } from './project/MembersTab'
 
 export const ProjectPage = () => {
   const { id } = useParams<{ id: string }>()
-  const projectId = parseInt(id!, 10)
+  const projectId = parseInt(id ?? '0', 10)
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { data: project, isLoading } = useProject(projectId)

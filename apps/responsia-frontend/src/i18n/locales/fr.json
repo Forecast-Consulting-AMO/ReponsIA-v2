@@ -56,6 +56,11 @@
     "confirmTitle": "Lancer l'analyse ?",
     "confirmMessage": "{{count}} document(s) seront analysés par l'IA. L'extraction des exigences, l'indexation des connaissances et l'analyse des retours seront lancées.",
     "start": "Lancer",
+    "batchUpload": "Importer des fichiers",
+    "batchUploadHint": "L'IA classifiera automatiquement vos documents",
+    "pendingFiles": "{{count}} fichier(s) à importer",
+    "classifying": "Classification en cours...",
+    "confirmUpload": "Confirmer l'import",
     "jobs": {
       "analysis": "Extraction des exigences",
       "indexing": "Indexation des connaissances",
@@ -90,7 +95,10 @@
     },
     "selected": "sélectionnée(s)",
     "autosaved": "Enregistré automatiquement",
-    "generating": "Rédaction en cours..."
+    "generating": "Rédaction en cours...",
+    "systemPrompt": "Prompt de rédaction",
+    "promptSaved": "Prompt enregistré",
+    "unsaved": "Non enregistré"
   },
   "review": {
     "responded": "Répondues",
@@ -156,6 +164,9 @@
       "notFound": "Ressource non trouvée",
       "serverError": "Erreur serveur",
       "serviceUnavailable": "Service indisponible"
-    }
+    },
+    "draftFailed": "Échec de la rédaction. Vérifiez votre clé API.",
+    "chatFailed": "Échec du chat. Vérifiez votre clé API.",
+    "classifyFailed": "La classification automatique a échoué"
   }
 }

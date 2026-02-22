@@ -46,7 +46,7 @@ export class RequirementsController {
   }
 
   /** SSE endpoint: stream a draft response for a single requirement */
-  @Get('requirements/:id/draft')
+  @Post('requirements/:id/draft')
   async draft(
     @Param('id', ParseIntPipe) id: number,
     @CurrentUser() user: { sub: string },

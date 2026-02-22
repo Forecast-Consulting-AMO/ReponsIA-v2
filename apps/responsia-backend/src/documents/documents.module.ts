@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm'
 import { Document } from '../database/entities/document.entity'
 import { StorageModule } from '../storage/storage.module'
 import { ProjectsModule } from '../projects/projects.module'
+import { AiModule } from '../ai/ai.module'
 import { DocumentsController } from './documents.controller'
 import { DocumentsService } from './documents.service'
 
@@ -11,6 +12,7 @@ import { DocumentsService } from './documents.service'
     TypeOrmModule.forFeature([Document]),
     StorageModule,
     ProjectsModule,
+    AiModule,
   ],
   controllers: [DocumentsController],
   providers: [DocumentsService],

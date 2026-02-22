@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useSnackbar } from 'notistack'
 import {
   Box,
   Typography,
@@ -14,10 +15,13 @@ import {
   Paper,
   CircularProgress,
   InputAdornment,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
 } from '@mui/material'
 import { DataGrid, GridColDef } from '@mui/x-data-grid'
-import { MessageSquare, Wand2, Send, Search } from 'lucide-react'
-import { useRequirements, useUpdateRequirement, useFeedback, useChatHistory } from '../../hooks/useApi'
+import { MessageSquare, Wand2, Send, Search, ChevronDown, Settings2 } from 'lucide-react'
+import { useRequirements, useUpdateRequirement, useFeedback, useChatHistory, useProjectSettings, useUpdateProjectSettings } from '../../hooks/useApi'
 import { useSSE } from '../../hooks/useSSE'
 
 const STATUS_COLORS: Record<string, 'default' | 'warning' | 'info' | 'success'> = {
@@ -33,11 +37,24 @@ interface Props {
 
 export const DraftingPhase = ({ projectId }: Props) => {
   const { t } = useTranslation()
+  const { enqueueSnackbar } = useSnackbar()
   const { data: requirements, refetch: refetchReqs } = useRequirements(projectId)
   const { data: feedback } = useFeedback(projectId)
   const { data: chatHistory, refetch: refetchChat } = useChatHistory(projectId)
+  const { data: projectSettings } = useProjectSettings(projectId)
+  const updateProjectSettings = useUpdateProjectSettings(projectId)
   const updateReq = useUpdateRequirement()
   const { startStream, isStreaming, streamedText } = useSSE()
+
+  // Inline prompt editing
+  const [draftPrompt, setDraftPrompt] = useState('')
+  const [promptDirty, setPromptDirty] = useState(false)
+
+  useEffect(() => {
+    if (projectSettings?.prompts?.drafting !== undefined) {
+      setDraftPrompt(projectSettings.prompts.drafting)
+    }
+  }, [projectSettings?.prompts?.drafting])
 
   const [selected, setSelected] = useState<any>(null)
   const [editText, setEditText] = useState('')
@@ -97,8 +114,33 @@ export const DraftingPhase = ({ projectId }: Props) => {
   const handleDraft = () => {
     if (!selected) return
     startStream(`/api/v1/requirements/${selected.id}/draft`, {}, {
-      onDone: () => refetchReqs(),
+      onDone: () => {
+        refetchReqs()
+      },
+      onError: (error) => {
+        enqueueSnackbar(error || t('errors.draftFailed'), { variant: 'error' })
+      },
     })
+  }
+
+  // Sync streamed text back to editor when streaming ends
+  useEffect(() => {
+    if (!isStreaming && streamedText && selected) {
+      setEditText(streamedText)
+    }
+  }, [isStreaming, streamedText, selected])
+
+  // Save inline prompt
+  const handleSavePrompt = async () => {
+    try {
+      await updateProjectSettings.mutateAsync({
+        prompts: { ...projectSettings?.prompts, drafting: draftPrompt },
+      })
+      setPromptDirty(false)
+      enqueueSnackbar(t('drafting.promptSaved'), { variant: 'success' })
+    } catch {
+      enqueueSnackbar(t('errors.http.generic'), { variant: 'error' })
+    }
   }
 
   // Save edited response
@@ -126,6 +168,10 @@ export const DraftingPhase = ({ projectId }: Props) => {
     setChatInput('')
     setChatMessages((prev) => [...prev, { role: 'user', content: msg }])
 
+    const onChatError = (error: string) => {
+      enqueueSnackbar(error || t('errors.chatFailed'), { variant: 'error' })
+    }
+
     // If this looks like an edit request and we have a selected requirement, use the edit endpoint
     if (selected && isEditIntent(msg)) {
       chatSSE.startStream(`/api/v1/projects/${projectId}/chat/edit`, {
@@ -143,6 +189,7 @@ export const DraftingPhase = ({ projectId }: Props) => {
           setChatMessages((prev) => [...prev, { role: 'assistant', content: chatSSE.streamedText || data?.text || '' }])
           refetchChat()
         },
+        onError: onChatError,
       })
     } else {
       chatSSE.startStream(`/api/v1/projects/${projectId}/chat`, { message: msg }, {
@@ -150,6 +197,7 @@ export const DraftingPhase = ({ projectId }: Props) => {
           setChatMessages((prev) => [...prev, { role: 'assistant', content: chatSSE.streamedText }])
           refetchChat()
         },
+        onError: onChatError,
       })
     }
   }
@@ -194,7 +242,10 @@ export const DraftingPhase = ({ projectId }: Props) => {
             size="small"
             startIcon={<Wand2 size={16} strokeWidth={1} />}
             variant="outlined"
-            onClick={() => startStream(`/api/v1/projects/${projectId}/draft-all`, {}, { onDone: () => refetchReqs() })}
+            onClick={() => startStream(`/api/v1/projects/${projectId}/draft-all`, {}, {
+              onDone: () => refetchReqs(),
+              onError: (error) => enqueueSnackbar(error || t('errors.draftFailed'), { variant: 'error' }),
+            })}
             disabled={isStreaming}
           >
             {t('drafting.draftAll')}
@@ -313,6 +364,39 @@ export const DraftingPhase = ({ projectId }: Props) => {
                   {t('drafting.autosaved')}
                 </Typography>
               )}
+
+              {/* Inline prompt editor */}
+              <Accordion sx={{ mt: 2 }} disableGutters>
+                <AccordionSummary expandIcon={<ChevronDown size={16} strokeWidth={1} />}>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Settings2 size={16} strokeWidth={1} />
+                    <Typography variant="subtitle2">{t('drafting.systemPrompt')}</Typography>
+                    {promptDirty && <Chip label={t('drafting.unsaved')} size="small" color="warning" />}
+                  </Box>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <TextField
+                    multiline
+                    minRows={4}
+                    maxRows={12}
+                    fullWidth
+                    size="small"
+                    value={draftPrompt}
+                    onChange={(e) => { setDraftPrompt(e.target.value); setPromptDirty(true) }}
+                    placeholder={t('settings.promptPlaceholder')}
+                  />
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      onClick={handleSavePrompt}
+                      disabled={!promptDirty || updateProjectSettings.isPending}
+                    >
+                      {t('common.save')}
+                    </Button>
+                  </Box>
+                </AccordionDetails>
+              </Accordion>
 
               {/* Matched feedback */}
               {matchedFeedback.length > 0 && (

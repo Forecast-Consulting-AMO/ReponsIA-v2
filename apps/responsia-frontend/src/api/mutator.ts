@@ -84,6 +84,8 @@ export const clearAllTokens = (): void => {
 
 export const isTokenAvailable = (): boolean => !!globalAccessToken;
 
+export const getGlobalToken = (): string | null => globalAccessToken;
+
 /**
  * Custom Axios instance used by Orval-generated hooks.
  */

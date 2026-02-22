@@ -56,6 +56,11 @@
     "confirmTitle": "Start Analysis?",
     "confirmMessage": "{{count}} document(s) will be analyzed by AI. Requirement extraction, knowledge indexing, and feedback analysis will be launched.",
     "start": "Start",
+    "batchUpload": "Upload files",
+    "batchUploadHint": "AI will auto-classify your documents",
+    "pendingFiles": "{{count}} file(s) to upload",
+    "classifying": "Classifying...",
+    "confirmUpload": "Confirm upload",
     "jobs": {
       "analysis": "Requirement extraction",
       "indexing": "Knowledge indexing",
@@ -90,7 +95,10 @@
     },
     "selected": "selected",
     "autosaved": "Auto-saved",
-    "generating": "Generating draft..."
+    "generating": "Generating draft...",
+    "systemPrompt": "Drafting Prompt",
+    "promptSaved": "Prompt saved",
+    "unsaved": "Unsaved"
   },
   "review": {
     "responded": "Responded",
@@ -156,6 +164,9 @@
       "notFound": "Resource not found",
       "serverError": "Server error",
       "serviceUnavailable": "Service unavailable"
-    }
+    },
+    "draftFailed": "Draft generation failed. Check your API key.",
+    "chatFailed": "Chat failed. Check your API key.",
+    "classifyFailed": "Auto-classification failed"
   }
 }

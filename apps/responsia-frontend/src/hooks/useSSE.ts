@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef } from 'react'
-import { AXIOS_INSTANCE } from '../api/mutator'
+import { AXIOS_INSTANCE, getGlobalToken } from '../api/mutator'
 
 interface SSEOptions {
   onToken?: (token: string) => void
@@ -25,20 +25,36 @@ export const useSSE = () => {
       abortRef.current = new AbortController()
 
       try {
+        const token = getGlobalToken()
+        const headers: Record<string, string> = {
+          'Content-Type': 'application/json',
+        }
+        if (token) {
+          headers['Authorization'] = `Bearer ${token}`
+        }
+
         const response = await fetch(
           `${AXIOS_INSTANCE.defaults.baseURL}${url}`,
           {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: AXIOS_INSTANCE.defaults.headers?.common?.[
-                'Authorization'
-              ] as string || '',
-            },
+            headers,
             body: JSON.stringify(body),
             signal: abortRef.current.signal,
           },
         )
+
+        if (!response.ok) {
+          const errorText = await response.text().catch(() => '')
+          let message = `HTTP ${response.status}`
+          try {
+            const parsed = JSON.parse(errorText)
+            message = parsed.message || parsed.error || message
+          } catch {
+            if (errorText) message = errorText
+          }
+          options?.onError?.(message)
+          return
+        }
 
         const reader = response.body?.getReader()
         if (!reader) throw new Error('No response body')

@@ -61,8 +61,31 @@ export class ChatService {
     )
   }
 
-  /** Get RAG context from knowledge base */
+  /** Get RAG context from knowledge base + requirements summary */
   async getProjectContext(projectId: number, query: string): Promise<string> {
+    const parts: string[] = []
+
+    // 1. Requirements summary — so the chat knows what the project is about
+    try {
+      const requirements = await this.requirementsRepo.find({
+        where: { projectId },
+        order: { sectionNumber: 'ASC' },
+      })
+      if (requirements.length > 0) {
+        const reqSummary = requirements
+          .map((r) => {
+            const status = r.responseStatus || 'pending'
+            const hasResponse = r.responseText ? ' [has response]' : ''
+            return `- ${r.sectionNumber || '?'} ${r.sectionTitle || ''}: ${r.requirementText?.substring(0, 200) || ''} (${status}${hasResponse})`
+          })
+          .join('\n')
+        parts.push(`Exigences du projet (${requirements.length} au total):\n${reqSummary}`)
+      }
+    } catch {
+      // Non-blocking
+    }
+
+    // 2. RAG from document chunks
     try {
       const embedding = await this.aiService.embed(query)
       const results = await this.chunkRepo.query(
@@ -77,13 +100,17 @@ export class ChatService {
       `,
         [JSON.stringify(embedding), query, projectId],
       )
-      if (results.length === 0) return ''
-      return results
-        .map((r: { content: string; score: number }) => `[${(r.score * 100).toFixed(0)}%] ${r.content}`)
-        .join('\n\n---\n\n')
+      if (results.length > 0) {
+        const ragContext = results
+          .map((r: { content: string; score: number }) => `[${(r.score * 100).toFixed(0)}%] ${r.content}`)
+          .join('\n\n---\n\n')
+        parts.push(`Documents pertinents:\n${ragContext}`)
+      }
     } catch {
-      return ''
+      // Embedding may fail if no OpenAI key — still return requirements context
     }
+
+    return parts.join('\n\n')
   }
 
   /** Get recent chat history as formatted string */

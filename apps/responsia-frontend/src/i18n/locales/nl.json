@@ -56,6 +56,11 @@
     "confirmTitle": "Analyse starten?",
     "confirmMessage": "{{count}} document(en) worden door AI geanalyseerd. Extractie van vereisten, kennisindexering en feedbackanalyse worden gestart.",
     "start": "Starten",
+    "batchUpload": "Bestanden uploaden",
+    "batchUploadHint": "AI classificeert uw documenten automatisch",
+    "pendingFiles": "{{count}} bestand(en) te uploaden",
+    "classifying": "Classificeren...",
+    "confirmUpload": "Upload bevestigen",
     "jobs": {
       "analysis": "Extractie van vereisten",
       "indexing": "Kennisindexering",
@@ -90,7 +95,10 @@
     },
     "selected": "geselecteerd",
     "autosaved": "Automatisch opgeslagen",
-    "generating": "Bezig met opstellen..."
+    "generating": "Bezig met opstellen...",
+    "systemPrompt": "Redactieprompt",
+    "promptSaved": "Prompt opgeslagen",
+    "unsaved": "Niet opgeslagen"
   },
   "review": {
     "responded": "Beantwoord",
@@ -156,6 +164,9 @@
       "notFound": "Bron niet gevonden",
       "serverError": "Serverfout",
       "serviceUnavailable": "Service niet beschikbaar"
-    }
+    },
+    "draftFailed": "Redactie mislukt. Controleer uw API-sleutel.",
+    "chatFailed": "Chat mislukt. Controleer uw API-sleutel.",
+    "classifyFailed": "Automatische classificatie mislukt"
   }
 }

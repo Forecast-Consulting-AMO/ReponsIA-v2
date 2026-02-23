@@ -10,12 +10,14 @@ import {
 } from 'typeorm'
 import type { Profile } from './profile.entity'
 import type { Document } from './document.entity'
-import type { Requirement } from './requirement.entity'
 import type { AnalysisFeedback } from './feedback.entity'
 import type { ChatMessage } from './chat-message.entity'
 import type { DocumentChunk } from './document-chunk.entity'
 import type { ProjectMember } from './project-member.entity'
 import type { JobProgress } from './job-progress.entity'
+import type { OutlineSection } from './outline-section.entity'
+import type { ExtractedItem } from './extracted-item.entity'
+import type { DraftGroup } from './draft-group.entity'
 
 @Entity('projects')
 export class Project {
@@ -62,9 +64,6 @@ export class Project {
   @OneToMany('Document', 'project')
   documents: Document[]
 
-  @OneToMany('Requirement', 'project')
-  requirements: Requirement[]
-
   @OneToMany('AnalysisFeedback', 'project')
   feedback: AnalysisFeedback[]
 
@@ -73,6 +72,15 @@ export class Project {
 
   @OneToMany('DocumentChunk', 'project')
   chunks: DocumentChunk[]
+
+  @OneToMany('OutlineSection', 'project')
+  outlineSections: OutlineSection[]
+
+  @OneToMany('ExtractedItem', 'project')
+  extractedItems: ExtractedItem[]
+
+  @OneToMany('DraftGroup', 'project')
+  draftGroups: DraftGroup[]
 
   @OneToMany('ProjectMember', 'project')
   members: ProjectMember[]

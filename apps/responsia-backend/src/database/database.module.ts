@@ -5,7 +5,10 @@ import { DataSource } from 'typeorm'
 import { Profile } from './entities/profile.entity'
 import { Project } from './entities/project.entity'
 import { Document } from './entities/document.entity'
-import { Requirement } from './entities/requirement.entity'
+import { OutlineSection } from './entities/outline-section.entity'
+import { ExtractedItem } from './entities/extracted-item.entity'
+import { DraftGroup } from './entities/draft-group.entity'
+import { ResponseDraft } from './entities/response-draft.entity'
 import { AnalysisFeedback } from './entities/feedback.entity'
 import { ChatMessage } from './entities/chat-message.entity'
 import { DocumentChunk } from './entities/document-chunk.entity'
@@ -16,7 +19,10 @@ const entities = [
   Profile,
   Project,
   Document,
-  Requirement,
+  OutlineSection,
+  ExtractedItem,
+  DraftGroup,
+  ResponseDraft,
   AnalysisFeedback,
   ChatMessage,
   DocumentChunk,

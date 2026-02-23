@@ -23,8 +23,8 @@ export class AnalysisFeedback {
   @Column({ name: 'document_id', nullable: true })
   documentId: number
 
-  @Column({ name: 'requirement_id', nullable: true })
-  requirementId: number
+  @Column({ name: 'extracted_item_id', nullable: true })
+  extractedItemId: number | null
 
   @Column({ name: 'section_reference', nullable: true })
   sectionReference: string

@@ -20,6 +20,7 @@ import { ExportModule } from '../export/export.module'
 import { SettingsModule } from '../settings/settings.module'
 import { OutlineModule } from '../outline/outline.module'
 import { ExtractionModule } from '../extraction/extraction.module'
+import { DraftGroupsModule } from '../draft-groups/draft-groups.module'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 
@@ -73,6 +74,7 @@ import { AppService } from './app.service'
     SettingsModule,
     OutlineModule,
     ExtractionModule,
+    DraftGroupsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

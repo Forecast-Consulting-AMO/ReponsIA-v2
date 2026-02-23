@@ -21,7 +21,7 @@ export class JobProgress {
   project: Project
 
   @Column({ name: 'job_type', type: 'varchar' })
-  jobType: 'analysis' | 'indexing' | 'feedback' | 'draft_all' | 'setup'
+  jobType: 'analysis' | 'indexing' | 'feedback' | 'draft_all' | 'setup' | 'structure' | 'extraction'
 
   @Column({ type: 'varchar', default: 'queued' })
   status: 'queued' | 'processing' | 'completed' | 'error'

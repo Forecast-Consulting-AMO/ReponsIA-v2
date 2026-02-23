@@ -18,6 +18,8 @@ import { ChatModule } from '../chat/chat.module'
 import { ComplianceModule } from '../compliance/compliance.module'
 import { ExportModule } from '../export/export.module'
 import { SettingsModule } from '../settings/settings.module'
+import { OutlineModule } from '../outline/outline.module'
+import { ExtractionModule } from '../extraction/extraction.module'
 import { AppController } from './app.controller'
 import { AppService } from './app.service'
 
@@ -69,6 +71,8 @@ import { AppService } from './app.service'
     ComplianceModule,
     ExportModule,
     SettingsModule,
+    OutlineModule,
+    ExtractionModule,
   ],
   controllers: [AppController],
   providers: [AppService],

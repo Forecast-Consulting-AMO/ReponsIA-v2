@@ -58,22 +58,112 @@ export const useUploadDocument = (projectId: number) => {
   })
 }
 
-// --- Requirements ---
+// --- Outline ---
 
-export const useRequirements = (projectId: number) =>
+export const useOutline = (projectId: number) =>
   useQuery({
-    queryKey: ['requirements', projectId],
-    queryFn: () =>
-      customInstance<any[]>({ url: `/api/v1/projects/${projectId}/requirements`, method: 'GET' }),
+    queryKey: ['outline', projectId],
+    queryFn: () => customInstance<any[]>({ url: `/api/v1/projects/${projectId}/outline`, method: 'GET' }),
     enabled: !!projectId,
   })
 
-export const useUpdateRequirement = () => {
+export const useAnalyzeStructure = (projectId: number) => {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ id, ...data }: { id: number; [key: string]: any }) =>
-      customInstance<any>({ url: `/api/v1/requirements/${id}`, method: 'PUT', data }),
-    onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ['requirements'] }),
+    mutationFn: () => customInstance<any>({ url: `/api/v1/projects/${projectId}/outline/analyze`, method: 'POST' }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['outline', projectId] }),
+  })
+}
+
+export const useCreateOutlineSection = (projectId: number) => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (data: any) => customInstance<any>({ url: `/api/v1/projects/${projectId}/outline`, method: 'POST', data }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['outline', projectId] }),
+  })
+}
+
+export const useUpdateOutlineSection = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, ...data }: any) => customInstance<any>({ url: `/api/v1/outline/${id}`, method: 'PUT', data }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['outline'] }),
+  })
+}
+
+export const useDeleteOutlineSection = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: number) => customInstance<any>({ url: `/api/v1/outline/${id}`, method: 'DELETE' }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['outline'] }),
+  })
+}
+
+export const useReorderOutline = (projectId: number) => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (sections: any[]) => customInstance<any>({ url: `/api/v1/projects/${projectId}/outline/reorder`, method: 'PUT', data: { sections } }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['outline', projectId] }),
+  })
+}
+
+// --- Extraction ---
+
+export const useExtractedItems = (projectId: number) =>
+  useQuery({
+    queryKey: ['items', projectId],
+    queryFn: () => customInstance<any[]>({ url: `/api/v1/projects/${projectId}/items`, method: 'GET' }),
+    enabled: !!projectId,
+  })
+
+export const useExtractedItemsByTheme = (projectId: number) =>
+  useQuery({
+    queryKey: ['items-by-theme', projectId],
+    queryFn: () => customInstance<any>({ url: `/api/v1/projects/${projectId}/items/by-theme`, method: 'GET' }),
+    enabled: !!projectId,
+  })
+
+export const useExtractItems = (projectId: number) => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: () => customInstance<any>({ url: `/api/v1/projects/${projectId}/extract`, method: 'POST' }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['items', projectId] })
+      qc.invalidateQueries({ queryKey: ['items-by-theme', projectId] })
+    },
+  })
+}
+
+export const useUpdateItem = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, ...data }: any) => customInstance<any>({ url: `/api/v1/items/${id}`, method: 'PUT', data }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['items'] }),
+  })
+}
+
+// --- Draft Groups ---
+
+export const useDraftGroups = (projectId: number) =>
+  useQuery({
+    queryKey: ['draft-groups', projectId],
+    queryFn: () => customInstance<any[]>({ url: `/api/v1/projects/${projectId}/draft-groups`, method: 'GET' }),
+    enabled: !!projectId,
+  })
+
+export const useUpdateDraftGroup = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, ...data }: any) => customInstance<any>({ url: `/api/v1/draft-groups/${id}`, method: 'PUT', data }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['draft-groups'] }),
+  })
+}
+
+export const useDraftAll = (projectId: number) => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: () => customInstance<any>({ url: `/api/v1/projects/${projectId}/draft-all`, method: 'POST' }),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['draft-groups', projectId] }),
   })
 }
 
@@ -115,7 +205,9 @@ export const useStartSetup = (projectId: number) => {
     mutationFn: () =>
       customInstance<any>({ url: `/api/v1/projects/${projectId}/setup/start`, method: 'POST' }),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['requirements', projectId] })
+      qc.invalidateQueries({ queryKey: ['outline', projectId] })
+      qc.invalidateQueries({ queryKey: ['items', projectId] })
+      qc.invalidateQueries({ queryKey: ['items-by-theme', projectId] })
       qc.invalidateQueries({ queryKey: ['knowledge', projectId] })
       qc.invalidateQueries({ queryKey: ['feedback', projectId] })
     },

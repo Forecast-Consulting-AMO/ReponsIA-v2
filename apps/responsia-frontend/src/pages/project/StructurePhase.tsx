@@ -32,7 +32,6 @@ import {
   X,
   Plus,
   Trash2,
-  GripVertical,
   Edit3,
   Check,
   ChevronUp,
@@ -87,7 +86,7 @@ export const StructurePhase = ({ projectId }: Props) => {
   useSSE()
 
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const [selectedFileType, setSelectedFileType] = useState<string>('rfp')
+  const [selectedFileType] = useState<string>('rfp')
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [progress, setProgress] = useState<any[]>([])
   const [pendingFiles, setPendingFiles] = useState<PendingFile[]>([])

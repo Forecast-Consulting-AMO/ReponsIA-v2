@@ -5,6 +5,7 @@ import { DatabaseModule } from '../database/database.module'
 import { AuthModule } from '../auth/auth.module'
 import { AiModule } from '../ai/ai.module'
 import { StorageModule } from '../storage/storage.module'
+import { SearchModule } from '../search/search.module'
 import { JobsModule } from '../jobs/jobs.module'
 import { HealthModule } from '../health/health.module'
 import { ProjectsModule } from '../projects/projects.module'
@@ -47,6 +48,9 @@ import { AppService } from './app.service'
 
     // Azure Blob Storage
     StorageModule,
+
+    // Azure AI Search + pgvector fallback
+    SearchModule,
 
     // Job queue (Azure Service Bus / local)
     JobsModule,

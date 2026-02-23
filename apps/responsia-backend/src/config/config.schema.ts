@@ -32,6 +32,11 @@ export const configValidationSchema = Joi.object({
   AZURE_DI_ENDPOINT: Joi.string().optional().allow('').default(''),
   AZURE_DI_KEY: Joi.string().optional().allow('').default(''),
 
+  // Azure AI Search (empty = use pgvector fallback)
+  AZURE_SEARCH_ENDPOINT: Joi.string().optional().allow('').default(''),
+  AZURE_SEARCH_KEY: Joi.string().optional().allow('').default(''),
+  AZURE_SEARCH_INDEX: Joi.string().optional().default('responsia-chunks'),
+
   // Server
   PORT: Joi.number().optional().default(3000),
   NODE_ENV: Joi.string().optional().default('development'),

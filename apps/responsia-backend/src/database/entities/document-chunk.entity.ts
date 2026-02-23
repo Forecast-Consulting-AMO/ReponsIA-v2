@@ -26,13 +26,13 @@ export class DocumentChunk {
   @Column({ type: 'text' })
   content: string
 
-  @Column({ name: 'section_title', nullable: true })
+  @Column({ name: 'section_title', type: 'varchar', nullable: true })
   sectionTitle: string
 
-  @Column({ name: 'start_char', nullable: true })
+  @Column({ name: 'start_char', type: 'int', nullable: true })
   startChar: number
 
-  @Column({ name: 'end_char', nullable: true })
+  @Column({ name: 'end_char', type: 'int', nullable: true })
   endChar: number
 
   @CreateDateColumn({ name: 'created_at' })

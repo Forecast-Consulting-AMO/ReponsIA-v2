@@ -16,7 +16,7 @@ export class Profile {
   @Column()
   email: string
 
-  @Column({ name: 'display_name', nullable: true })
+  @Column({ name: 'display_name', type: 'varchar', nullable: true })
   displayName: string
 
   @Column({ default: 'user' })

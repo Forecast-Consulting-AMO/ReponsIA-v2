@@ -38,7 +38,7 @@ export class Document {
   @Column({ name: 'parsed_structure', type: 'jsonb', nullable: true })
   parsedStructure: Record<string, unknown>
 
-  @Column({ name: 'page_count', nullable: true })
+  @Column({ name: 'page_count', type: 'int', nullable: true })
   pageCount: number
 
   @Column({ name: 'ocr_used', default: false })

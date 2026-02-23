@@ -20,7 +20,7 @@ export class ProjectMember {
   @JoinColumn({ name: 'project_id' })
   project: Project
 
-  @Column({ name: 'auth0_id', nullable: true })
+  @Column({ name: 'auth0_id', type: 'varchar', nullable: true })
   auth0Id: string
 
   @Column()

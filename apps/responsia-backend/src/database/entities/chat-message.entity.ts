@@ -32,7 +32,7 @@ export class ChatMessage {
   @Column({ type: 'jsonb', nullable: true })
   context: Record<string, unknown>
 
-  @Column({ name: 'edit_target_item_id', nullable: true })
+  @Column({ name: 'edit_target_item_id', type: 'int', nullable: true })
   editTargetItemId: number
 
   @Column({ name: 'edit_diff', type: 'jsonb', nullable: true })

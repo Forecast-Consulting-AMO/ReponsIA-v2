@@ -22,7 +22,7 @@ export class OutlineSection {
   @JoinColumn({ name: 'project_id' })
   project: Project
 
-  @Column({ name: 'parent_id', nullable: true })
+  @Column({ name: 'parent_id', type: 'int', nullable: true })
   parentId: number | null
 
   @ManyToOne('OutlineSection', 'children', {

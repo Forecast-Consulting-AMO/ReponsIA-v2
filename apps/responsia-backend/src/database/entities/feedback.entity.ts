@@ -20,13 +20,13 @@ export class AnalysisFeedback {
   @JoinColumn({ name: 'project_id' })
   project: Project
 
-  @Column({ name: 'document_id', nullable: true })
+  @Column({ name: 'document_id', type: 'int', nullable: true })
   documentId: number
 
-  @Column({ name: 'extracted_item_id', nullable: true })
+  @Column({ name: 'extracted_item_id', type: 'int', nullable: true })
   extractedItemId: number | null
 
-  @Column({ name: 'section_reference', nullable: true })
+  @Column({ name: 'section_reference', type: 'varchar', nullable: true })
   sectionReference: string
 
   @Column({ name: 'feedback_type', type: 'varchar' })

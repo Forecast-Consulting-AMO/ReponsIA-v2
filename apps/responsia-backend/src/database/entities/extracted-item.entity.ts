@@ -22,7 +22,7 @@ export class ExtractedItem {
   @JoinColumn({ name: 'project_id' })
   project: Project
 
-  @Column({ name: 'outline_section_id', nullable: true })
+  @Column({ name: 'outline_section_id', type: 'int', nullable: true })
   outlineSectionId: number | null
 
   @ManyToOne('OutlineSection', { onDelete: 'SET NULL', nullable: true })
@@ -35,13 +35,13 @@ export class ExtractedItem {
   @Column({ name: 'original_text', type: 'text' })
   originalText: string
 
-  @Column({ name: 'section_reference', nullable: true })
+  @Column({ name: 'section_reference', type: 'varchar', nullable: true })
   sectionReference: string | null
 
-  @Column({ name: 'source_document_id', nullable: true })
+  @Column({ name: 'source_document_id', type: 'int', nullable: true })
   sourceDocumentId: number | null
 
-  @Column({ name: 'source_page', nullable: true })
+  @Column({ name: 'source_page', type: 'int', nullable: true })
   sourcePage: number | null
 
   @Column({ name: 'ai_themes', type: 'text', array: true, default: '{}' })

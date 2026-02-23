@@ -39,14 +39,43 @@
       "in_progress": "En cours",
       "completed": "Terminé"
     },
-    "setup": {
-      "title": "Préparation"
+    "structure": {
+      "title": "Structure",
+      "analyzeBtn": "Analyser la structure",
+      "analyzing": "Analyse en cours...",
+      "addSection": "Ajouter une section",
+      "noSections": "Aucune section. Envoyez des documents puis analysez la structure."
+    },
+    "extract": {
+      "title": "Extraction",
+      "questions": "Questions",
+      "conditions": "Conditions",
+      "bySection": "Par section",
+      "byTheme": "Par thème",
+      "reclassify": "Reclassifier",
+      "extractBtn": "Extraire les éléments",
+      "extracting": "Extraction en cours...",
+      "noItems": "Aucun élément extrait. Lancez l'extraction."
     },
     "drafting": {
-      "title": "Rédaction"
+      "title": "Rédaction",
+      "sections": "Sections",
+      "model": "Modèle",
+      "generate": "Générer",
+      "draftAll": "Rédiger tout",
+      "groupItems": "Éléments de cette section",
+      "prompt": "Prompt système"
     },
     "review": {
-      "title": "Revue & Export"
+      "title": "Revue & Export",
+      "compliance": "Vérifier la conformité",
+      "coverage": "Couverture",
+      "quality": "Qualité",
+      "pending": "En attente",
+      "exportClean": "Export structuré",
+      "exportTemplate": "Export avec modèle",
+      "documentPreview": "Aperçu du document",
+      "editSection": "Cliquez pour modifier"
     }
   },
   "setup": {

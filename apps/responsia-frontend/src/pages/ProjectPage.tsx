@@ -10,13 +10,15 @@ import {
   Tooltip,
   CircularProgress,
 } from '@mui/material'
-import { ArrowLeft, Upload, Pencil, ShieldCheck, Settings, Users } from 'lucide-react'
+import { Upload, List, Pencil, ShieldCheck, Users, Settings } from 'lucide-react'
 import { useProject } from '../hooks/useApi'
-import { SetupPhase } from './project/SetupPhase'
+import { StructurePhase } from './project/StructurePhase'
+import { ExtractPhase } from './project/ExtractPhase'
 import { DraftingPhase } from './project/DraftingPhase'
 import { ReviewPhase } from './project/ReviewPhase'
 import { ProjectSettingsTab } from './project/ProjectSettingsTab'
 import { MembersTab } from './project/MembersTab'
+import { ArrowLeft } from 'lucide-react'
 
 export const ProjectPage = () => {
   const { id } = useParams<{ id: string }>()
@@ -56,18 +58,20 @@ export const ProjectPage = () => {
       </Box>
 
       <Tabs value={phase} onChange={(_, v) => setPhase(v)} sx={{ mb: 3 }}>
-        <Tab icon={<Upload size={18} strokeWidth={1} />} iconPosition="start" label={t('project.setup.title')} />
+        <Tab icon={<Upload size={18} strokeWidth={1} />} iconPosition="start" label={t('project.structure.title')} />
+        <Tab icon={<List size={18} strokeWidth={1} />} iconPosition="start" label={t('project.extract.title')} />
         <Tab icon={<Pencil size={18} strokeWidth={1} />} iconPosition="start" label={t('project.drafting.title')} />
         <Tab icon={<ShieldCheck size={18} strokeWidth={1} />} iconPosition="start" label={t('project.review.title')} />
         <Tab icon={<Users size={18} strokeWidth={1} />} iconPosition="start" label={t('members.title')} />
         <Tab icon={<Settings size={18} strokeWidth={1} />} iconPosition="start" label={t('nav.settings')} />
       </Tabs>
 
-      {phase === 0 && <SetupPhase projectId={projectId} />}
-      {phase === 1 && <DraftingPhase projectId={projectId} />}
-      {phase === 2 && <ReviewPhase projectId={projectId} />}
-      {phase === 3 && <MembersTab projectId={projectId} />}
-      {phase === 4 && <ProjectSettingsTab projectId={projectId} />}
+      {phase === 0 && <StructurePhase projectId={projectId} />}
+      {phase === 1 && <ExtractPhase projectId={projectId} />}
+      {phase === 2 && <DraftingPhase projectId={projectId} />}
+      {phase === 3 && <ReviewPhase projectId={projectId} />}
+      {phase === 4 && <MembersTab projectId={projectId} />}
+      {phase === 5 && <ProjectSettingsTab projectId={projectId} />}
     </Box>
   )
 }

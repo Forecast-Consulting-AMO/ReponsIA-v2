@@ -39,14 +39,43 @@
       "in_progress": "In progress",
       "completed": "Completed"
     },
-    "setup": {
-      "title": "Setup"
+    "structure": {
+      "title": "Structure",
+      "analyzeBtn": "Analyze structure",
+      "analyzing": "Analyzing...",
+      "addSection": "Add a section",
+      "noSections": "No sections. Upload documents then analyze the structure."
+    },
+    "extract": {
+      "title": "Extract",
+      "questions": "Questions",
+      "conditions": "Conditions",
+      "bySection": "By section",
+      "byTheme": "By theme",
+      "reclassify": "Reclassify",
+      "extractBtn": "Extract items",
+      "extracting": "Extracting...",
+      "noItems": "No items extracted. Run extraction."
     },
     "drafting": {
-      "title": "Drafting"
+      "title": "Drafting",
+      "sections": "Sections",
+      "model": "Model",
+      "generate": "Generate",
+      "draftAll": "Draft All",
+      "groupItems": "Items in this section",
+      "prompt": "System prompt"
     },
     "review": {
-      "title": "Review & Export"
+      "title": "Review & Export",
+      "compliance": "Check compliance",
+      "coverage": "Coverage",
+      "quality": "Quality",
+      "pending": "Pending",
+      "exportClean": "Structured export",
+      "exportTemplate": "Export with template",
+      "documentPreview": "Document preview",
+      "editSection": "Click to edit"
     }
   },
   "setup": {

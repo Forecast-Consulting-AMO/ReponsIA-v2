@@ -39,14 +39,43 @@
       "in_progress": "In uitvoering",
       "completed": "Voltooid"
     },
-    "setup": {
-      "title": "Voorbereiding"
+    "structure": {
+      "title": "Structuur",
+      "analyzeBtn": "Structuur analyseren",
+      "analyzing": "Analyse bezig...",
+      "addSection": "Sectie toevoegen",
+      "noSections": "Geen secties. Upload documenten en analyseer de structuur."
+    },
+    "extract": {
+      "title": "Extractie",
+      "questions": "Vragen",
+      "conditions": "Voorwaarden",
+      "bySection": "Per sectie",
+      "byTheme": "Per thema",
+      "reclassify": "Herclassificeren",
+      "extractBtn": "Elementen extraheren",
+      "extracting": "Extractie bezig...",
+      "noItems": "Geen elementen geextraheerd. Start de extractie."
     },
     "drafting": {
-      "title": "Redactie"
+      "title": "Redactie",
+      "sections": "Secties",
+      "model": "Model",
+      "generate": "Genereren",
+      "draftAll": "Alles opstellen",
+      "groupItems": "Elementen in deze sectie",
+      "prompt": "Systeemprompt"
     },
     "review": {
-      "title": "Controle & Export"
+      "title": "Controle & Export",
+      "compliance": "Conformiteit controleren",
+      "coverage": "Dekking",
+      "quality": "Kwaliteit",
+      "pending": "In afwachting",
+      "exportClean": "Gestructureerde export",
+      "exportTemplate": "Exporteren met sjabloon",
+      "documentPreview": "Documentvoorbeeld",
+      "editSection": "Klik om te bewerken"
     }
   },
   "setup": {

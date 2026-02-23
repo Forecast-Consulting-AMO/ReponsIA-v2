@@ -14,55 +14,25 @@ export interface AiModel {
 }
 
 export const AI_MODELS: AiModel[] = [
-  // Anthropic
   {
-    id: 'claude-opus',
-    label: 'Claude Opus 4',
+    id: 'claude-sonnet-4.6',
+    label: 'Claude Sonnet 4.6',
     provider: 'anthropic',
-    modelId: 'claude-opus-4-0-20250514',
+    modelId: 'claude-sonnet-4-6-20250514',
     maxOutput: 16384,
   },
   {
-    id: 'claude-sonnet',
-    label: 'Claude Sonnet 4',
+    id: 'claude-opus-4.6',
+    label: 'Claude Opus 4.6',
     provider: 'anthropic',
-    modelId: 'claude-sonnet-4-5-20250929',
+    modelId: 'claude-opus-4-6-20250514',
     maxOutput: 16384,
   },
   {
-    id: 'claude-haiku',
-    label: 'Claude Haiku 3.5',
-    provider: 'anthropic',
-    modelId: 'claude-haiku-4-5-20251001',
-    maxOutput: 8192,
-  },
-  // OpenAI
-  {
-    id: 'gpt-4o',
-    label: 'GPT-4o',
+    id: 'gpt-chat-5.2',
+    label: 'GPT Chat 5.2',
     provider: 'openai',
-    modelId: 'gpt-4o',
-    maxOutput: 16384,
-  },
-  {
-    id: 'gpt-4o-mini',
-    label: 'GPT-4o Mini',
-    provider: 'openai',
-    modelId: 'gpt-4o-mini',
-    maxOutput: 16384,
-  },
-  {
-    id: 'gpt-4.1',
-    label: 'GPT-4.1',
-    provider: 'openai',
-    modelId: 'gpt-4.1',
-    maxOutput: 32768,
-  },
-  {
-    id: 'gpt-4.1-mini',
-    label: 'GPT-4.1 Mini',
-    provider: 'openai',
-    modelId: 'gpt-4.1-mini',
+    modelId: 'gpt-chat-5.2',
     maxOutput: 32768,
   },
 ]
@@ -70,6 +40,8 @@ export const AI_MODELS: AiModel[] = [
 /** Operation types that can each have a different model assigned */
 export type OperationType =
   | 'analysis'
+  | 'structure'
+  | 'extraction'
   | 'drafting'
   | 'feedback'
   | 'compliance'
@@ -78,12 +50,14 @@ export type OperationType =
 
 /** Default model assignments per operation */
 export const DEFAULT_MODELS: Record<OperationType, string> = {
-  analysis: 'claude-sonnet',
-  drafting: 'claude-sonnet',
-  feedback: 'claude-sonnet',
-  compliance: 'claude-sonnet',
-  chat: 'claude-haiku',
-  embedding: 'gpt-4o-mini', // OpenAI embeddings only
+  analysis: 'claude-sonnet-4.6',
+  structure: 'claude-sonnet-4.6',
+  extraction: 'claude-sonnet-4.6',
+  drafting: 'claude-sonnet-4.6',
+  feedback: 'claude-sonnet-4.6',
+  compliance: 'claude-sonnet-4.6',
+  chat: 'claude-sonnet-4.6',
+  embedding: 'gpt-chat-5.2',
 }
 
 export function getModelById(id: string): AiModel | undefined {

@@ -10,7 +10,6 @@ import { JobsModule } from '../jobs/jobs.module'
 import { HealthModule } from '../health/health.module'
 import { ProjectsModule } from '../projects/projects.module'
 import { DocumentsModule } from '../documents/documents.module'
-import { RequirementsModule } from '../requirements/requirements.module'
 import { KnowledgeModule } from '../knowledge/knowledge.module'
 import { FeedbackModule } from '../feedback/feedback.module'
 import { SetupModule } from '../setup/setup.module'
@@ -64,7 +63,6 @@ import { AppService } from './app.service'
     // Feature modules
     ProjectsModule,
     DocumentsModule,
-    RequirementsModule,
     KnowledgeModule,
     FeedbackModule,
     SetupModule,

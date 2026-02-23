@@ -5,6 +5,7 @@ import { Document } from '../../database/entities/document.entity'
 import { DocumentChunk } from '../../database/entities/document-chunk.entity'
 import { JobProgress } from '../../database/entities/job-progress.entity'
 import { AiService } from '../../ai/ai.service'
+import { SearchService } from '../../search/search.service'
 
 const CHUNK_SIZE = 1000
 const CHUNK_OVERLAP = 200
@@ -22,6 +23,7 @@ export class IndexingProcessor {
     private jobProgressRepo: Repository<JobProgress>,
     private aiService: AiService,
     private dataSource: DataSource,
+    private searchService: SearchService,
   ) {}
 
   /** Chunk and embed knowledge-base documents (past_submission + reference) */
@@ -46,7 +48,7 @@ export class IndexingProcessor {
       if (docs.length === 0) {
         job.status = 'completed'
         job.progress = 100
-        job.message = 'Aucun document de connaissance trouvé'
+        job.message = 'Aucun document de connaissance trouve'
         job.completedAt = new Date()
         await this.jobProgressRepo.save(job)
         return
@@ -107,13 +109,25 @@ export class IndexingProcessor {
           this.logger.warn(`Embedding batch failed (chunk ${i}): ${err}`)
         }
 
-        job.progress = 80 + Math.round((i / allChunks.length) * 20)
+        job.progress = 80 + Math.round((i / allChunks.length) * 15)
         await this.jobProgressRepo.save(job)
+      }
+
+      // Push to Azure AI Search (if configured)
+      job.progress = 95
+      job.message = 'Indexation dans Azure AI Search...'
+      await this.jobProgressRepo.save(job)
+
+      try {
+        const freshChunks = await this.chunkRepo.find({ where: { projectId } })
+        await this.searchService.indexChunks(projectId, freshChunks)
+      } catch (err) {
+        this.logger.warn(`Azure AI Search indexing failed (non-blocking): ${err}`)
       }
 
       job.status = 'completed'
       job.progress = 100
-      job.message = `${totalChunks} chunks indexés`
+      job.message = `${totalChunks} chunks indexes`
       job.completedAt = new Date()
       await this.jobProgressRepo.save(job)
     } catch (err: any) {

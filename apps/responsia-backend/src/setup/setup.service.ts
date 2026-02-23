@@ -4,10 +4,10 @@ import { Repository } from 'typeorm'
 import { JobProgress } from '../database/entities/job-progress.entity'
 import { ProjectsService } from '../projects/projects.service'
 import { QUEUE_SERVICE, QueueService } from '../jobs/queue.interface'
-import { AnalysisProcessor } from './processors/analysis.processor'
+import { OutlineService } from '../outline/outline.service'
+import { ExtractionService } from '../extraction/extraction.service'
 import { IndexingProcessor } from './processors/indexing.processor'
 import { FeedbackProcessor } from './processors/feedback.processor'
-import { DraftAllProcessor } from './processors/draft-all.processor'
 
 @Injectable()
 export class SetupService {
@@ -18,26 +18,20 @@ export class SetupService {
     private jobProgressRepo: Repository<JobProgress>,
     private projectsService: ProjectsService,
     @Inject(QUEUE_SERVICE) private queueService: QueueService,
-    private analysisProcessor: AnalysisProcessor,
+    private outlineService: OutlineService,
+    private extractionService: ExtractionService,
     private indexingProcessor: IndexingProcessor,
     private feedbackProcessor: FeedbackProcessor,
-    private draftAllProcessor: DraftAllProcessor,
   ) {
     // Register queue handlers
     this.queueService.register('setup-pipeline', async (payload) => {
       await this.runPipeline(payload.projectId as number)
-    })
-    this.queueService.register('analysis', async (payload) => {
-      await this.analysisProcessor.process(payload.projectId as number)
     })
     this.queueService.register('indexing', async (payload) => {
       await this.indexingProcessor.process(payload.projectId as number)
     })
     this.queueService.register('feedback', async (payload) => {
       await this.feedbackProcessor.process(payload.projectId as number)
-    })
-    this.queueService.register('draft-all', async (payload) => {
-      await this.draftAllProcessor.process(payload.projectId as number)
     })
   }
 
@@ -51,17 +45,20 @@ export class SetupService {
     return { jobId }
   }
 
-  /** Run the full pipeline: analysis → indexing → feedback (sequential) */
+  /** Run the 4-phase pipeline: structure → extraction → indexing → feedback */
   private async runPipeline(projectId: number): Promise<void> {
     this.logger.log(`Starting setup pipeline for project ${projectId}`)
 
-    // Step 1: Extract requirements from RFP docs
-    await this.analysisProcessor.process(projectId)
+    // Step 1: Analyze structure (outline sections + draft groups)
+    await this.outlineService.analyzeStructure(projectId, 'system')
 
-    // Step 2: Index knowledge base (past submissions + references)
+    // Step 2: Extract items (questions + conditions from RFP docs)
+    await this.extractionService.extractItems(projectId, 'system')
+
+    // Step 3: Index knowledge base (past submissions + references)
     await this.indexingProcessor.process(projectId)
 
-    // Step 3: Extract feedback from analysis reports
+    // Step 4: Extract feedback from analysis reports
     await this.feedbackProcessor.process(projectId)
 
     this.logger.log(`Setup pipeline completed for project ${projectId}`)

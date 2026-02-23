@@ -9,7 +9,9 @@ import {
   HeadingLevel,
   AlignmentType,
 } from 'docx'
-import { Requirement } from '../database/entities/requirement.entity'
+import { OutlineSection } from '../database/entities/outline-section.entity'
+import { DraftGroup } from '../database/entities/draft-group.entity'
+import { ExtractedItem } from '../database/entities/extracted-item.entity'
 import { Project } from '../database/entities/project.entity'
 import { Document as DocumentEntity } from '../database/entities/document.entity'
 import { ProjectsService } from '../projects/projects.service'
@@ -20,8 +22,12 @@ export class ExportService {
   private readonly logger = new Logger(ExportService.name)
 
   constructor(
-    @InjectRepository(Requirement)
-    private requirementsRepo: Repository<Requirement>,
+    @InjectRepository(OutlineSection)
+    private sectionRepo: Repository<OutlineSection>,
+    @InjectRepository(DraftGroup)
+    private groupRepo: Repository<DraftGroup>,
+    @InjectRepository(ExtractedItem)
+    private itemRepo: Repository<ExtractedItem>,
     @InjectRepository(Project)
     private projectsRepo: Repository<Project>,
     @InjectRepository(DocumentEntity)
@@ -38,10 +44,28 @@ export class ExportService {
     await this.projectsService.verifyAccess(projectId, auth0Id)
 
     const project = await this.projectsRepo.findOneOrFail({ where: { id: projectId } })
-    const requirements = await this.requirementsRepo.find({
+    const sections = await this.sectionRepo.find({
       where: { projectId },
-      order: { sectionNumber: 'ASC' },
+      order: { position: 'ASC' },
     })
+    const groups = await this.groupRepo.find({ where: { projectId } })
+    const items = await this.itemRepo.find({ where: { projectId } })
+
+    // Map groups by outlineSectionId for quick lookup
+    const groupBySection = new Map<number, DraftGroup>()
+    for (const g of groups) {
+      groupBySection.set(g.outlineSectionId, g)
+    }
+
+    // Map items by outlineSectionId
+    const itemsBySection = new Map<number, ExtractedItem[]>()
+    for (const item of items) {
+      if (item.outlineSectionId) {
+        const arr = itemsBySection.get(item.outlineSectionId) || []
+        arr.push(item)
+        itemsBySection.set(item.outlineSectionId, arr)
+      }
+    }
 
     const children: Paragraph[] = [
       // Title
@@ -63,7 +87,7 @@ export class ExportService {
       new Paragraph({
         children: [
           new TextRun({
-            text: `Généré le ${new Date().toLocaleDateString('fr-FR')}`,
+            text: `Genere le ${new Date().toLocaleDateString('fr-FR')}`,
             size: 20,
             color: '888888',
           }),
@@ -72,14 +96,14 @@ export class ExportService {
       }),
     ]
 
-    // Add each requirement as a section
-    for (const req of requirements) {
+    // Add each outline section
+    for (const section of sections) {
       // Section header
       children.push(
         new Paragraph({
           children: [
             new TextRun({
-              text: `${req.sectionNumber} — ${req.sectionTitle}`,
+              text: section.title,
               bold: true,
               size: 28,
             }),
@@ -89,43 +113,29 @@ export class ExportService {
         }),
       )
 
-      // Requirement text
-      children.push(
-        new Paragraph({
-          children: [
-            new TextRun({ text: 'Exigence: ', bold: true, size: 22 }),
-            new TextRun({ text: req.requirementText, size: 22 }),
-          ],
-          spacing: { after: 200 },
-        }),
-      )
-
-      // Type badge
-      children.push(
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: `Type: ${req.requirementType}${req.maxScore ? ` (max ${req.maxScore} pts)` : ''}`,
-              italics: true,
-              size: 20,
-              color: '666666',
-            }),
-          ],
-        }),
-      )
-
-      // Response
-      if (req.responseText) {
+      if (section.description) {
         children.push(
           new Paragraph({
             children: [
-              new TextRun({ text: 'Réponse:', bold: true, size: 22 }),
+              new TextRun({ text: section.description, italics: true, size: 20, color: '666666' }),
+            ],
+            spacing: { after: 200 },
+          }),
+        )
+      }
+
+      // Draft group response
+      const group = groupBySection.get(section.id)
+      if (group?.generatedText) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Reponse:', bold: true, size: 22 }),
             ],
             spacing: { before: 200 },
           }),
         )
-        // Split response into paragraphs
-        for (const para of req.responseText.split('\n')) {
+        for (const para of group.generatedText.split('\n')) {
           if (para.trim()) {
             children.push(
               new Paragraph({
@@ -140,7 +150,7 @@ export class ExportService {
           new Paragraph({
             children: [
               new TextRun({
-                text: '[Réponse non rédigée]',
+                text: '[Reponse non redigee]',
                 italics: true,
                 color: 'CC0000',
                 size: 22,
@@ -148,6 +158,31 @@ export class ExportService {
             ],
           }),
         )
+      }
+
+      // Conditions checklist for this section
+      const sectionItems = itemsBySection.get(section.id) || []
+      const conditionItems = sectionItems.filter((i) => i.kind === 'condition')
+      if (conditionItems.length > 0) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({ text: 'Conditions:', bold: true, size: 22 }),
+            ],
+            spacing: { before: 200 },
+          }),
+        )
+        for (const cond of conditionItems) {
+          const check = cond.addressed ? '[x]' : '[ ]'
+          children.push(
+            new Paragraph({
+              children: [
+                new TextRun({ text: `${check} ${cond.originalText}`, size: 20 }),
+              ],
+              spacing: { after: 50 },
+            }),
+          )
+        }
       }
     }
 
@@ -163,16 +198,22 @@ export class ExportService {
     await this.projectsService.verifyAccess(projectId, auth0Id)
 
     const project = await this.projectsRepo.findOneOrFail({ where: { id: projectId } })
-    const requirements = await this.requirementsRepo.find({
+    const sections = await this.sectionRepo.find({
       where: { projectId },
-      order: { sectionNumber: 'ASC' },
+      order: { position: 'ASC' },
     })
+    const groups = await this.groupRepo.find({ where: { projectId } })
+
+    const groupBySection = new Map<number, DraftGroup>()
+    for (const g of groups) {
+      groupBySection.set(g.outlineSectionId, g)
+    }
 
     const templateDoc = await this.documentsRepo.findOne({
       where: { projectId, fileType: 'template' },
     })
     if (!templateDoc?.blobName) {
-      throw new NotFoundException('Aucun modèle Word importé pour ce projet')
+      throw new NotFoundException('Aucun modele Word importe pour ce projet')
     }
 
     const templateBuffer = await this.storageService.download(templateDoc.blobName)
@@ -190,20 +231,24 @@ export class ExportService {
     xml = xml.replace(/\{\{PROJECT_DESCRIPTION\}\}/g, this.escapeXml(project.description || ''))
     xml = xml.replace(/\{\{DATE\}\}/g, new Date().toLocaleDateString('fr-FR'))
 
-    // Replace section-specific placeholders: {{SECTION_3_1_2}} etc.
-    for (const req of requirements) {
-      const key = `SECTION_${req.sectionNumber?.replace(/\./g, '_')}`
+    // Replace section-specific placeholders using outline section titles
+    for (const section of sections) {
+      const group = groupBySection.get(section.id)
+      const key = `SECTION_${section.title.replace(/[^a-zA-Z0-9]/g, '_').toUpperCase()}`
       xml = xml.replace(
         new RegExp(`\\{\\{${key}\\}\\}`, 'g'),
-        this.escapeXml(req.responseText || '[Non rédigé]'),
+        this.escapeXml(group?.generatedText || '[Non redige]'),
       )
     }
 
-    // Replace {{REQUIREMENTS_TABLE}} with a formatted list of all requirements+responses
-    const reqTable = requirements
-      .map((r) => `${r.sectionNumber} - ${r.sectionTitle}\n${r.responseText || '[Non rédigé]'}`)
+    // Replace {{SECTIONS_TABLE}} with a formatted list of all sections+responses
+    const sectionsTable = sections
+      .map((s) => {
+        const group = groupBySection.get(s.id)
+        return `${s.title}\n${group?.generatedText || '[Non redige]'}`
+      })
       .join('\n\n')
-    xml = xml.replace(/\{\{REQUIREMENTS_TABLE\}\}/g, this.escapeXml(reqTable))
+    xml = xml.replace(/\{\{SECTIONS_TABLE\}\}/g, this.escapeXml(sectionsTable))
 
     zip.file('word/document.xml', xml)
     const output = await zip.generateAsync({ type: 'nodebuffer' })

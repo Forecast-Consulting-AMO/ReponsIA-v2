@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { Document } from '../../database/entities/document.entity'
 import { AnalysisFeedback } from '../../database/entities/feedback.entity'
-import { Requirement } from '../../database/entities/requirement.entity'
+import { ExtractedItem } from '../../database/entities/extracted-item.entity'
 import { JobProgress } from '../../database/entities/job-progress.entity'
 import { AiService } from '../../ai/ai.service'
 
@@ -16,14 +16,14 @@ export class FeedbackProcessor {
     private documentsRepo: Repository<Document>,
     @InjectRepository(AnalysisFeedback)
     private feedbackRepo: Repository<AnalysisFeedback>,
-    @InjectRepository(Requirement)
-    private requirementsRepo: Repository<Requirement>,
+    @InjectRepository(ExtractedItem)
+    private itemRepo: Repository<ExtractedItem>,
     @InjectRepository(JobProgress)
     private jobProgressRepo: Repository<JobProgress>,
     private aiService: AiService,
   ) {}
 
-  /** Extract feedback from analysis_report documents and match to requirements */
+  /** Extract feedback from analysis_report documents and match to extracted items */
   async process(projectId: number): Promise<void> {
     const job = this.jobProgressRepo.create({
       projectId,
@@ -42,7 +42,7 @@ export class FeedbackProcessor {
       if (reportDocs.length === 0) {
         job.status = 'completed'
         job.progress = 100
-        job.message = 'Aucun rapport d\'analyse trouvé'
+        job.message = 'Aucun rapport d\'analyse trouve'
         job.completedAt = new Date()
         await this.jobProgressRepo.save(job)
         return
@@ -51,8 +51,8 @@ export class FeedbackProcessor {
       const model = this.aiService.resolveModel('feedback')
       const systemPrompt = this.aiService.resolvePrompt('feedback')
 
-      // Load requirements for smart matching
-      const requirements = await this.requirementsRepo.find({
+      // Load extracted items for smart matching
+      const items = await this.itemRepo.find({
         where: { projectId },
       })
 
@@ -74,31 +74,31 @@ export class FeedbackProcessor {
 
         try {
           const parsed = JSON.parse(response)
-          const items = Array.isArray(parsed) ? parsed : [parsed]
+          const feedbackItems = Array.isArray(parsed) ? parsed : [parsed]
 
-          for (const item of items) {
-            // Smart match: find requirement by section reference
-            let matchedReqId: number | null = null
-            if (item.sectionReference && requirements.length > 0) {
-              const matched = requirements.find(
-                (r) =>
-                  r.sectionNumber === item.sectionReference ||
-                  r.sectionTitle
+          for (const fb of feedbackItems) {
+            // Smart match: find extracted item by section reference
+            let matchedItemId: number | null = null
+            if (fb.sectionReference && items.length > 0) {
+              const matched = items.find(
+                (item) =>
+                  item.sectionReference === fb.sectionReference ||
+                  item.originalText
                     ?.toLowerCase()
-                    .includes(item.sectionReference?.toLowerCase()),
+                    .includes(fb.sectionReference?.toLowerCase()),
               )
-              if (matched) matchedReqId = matched.id
+              if (matched) matchedItemId = matched.id
             }
 
             await this.feedbackRepo.save(
               this.feedbackRepo.create({
                 projectId,
                 documentId: doc.id,
-                requirementId: matchedReqId ?? undefined,
-                sectionReference: item.sectionReference || '',
-                feedbackType: item.feedbackType || 'comment',
-                severity: item.severity || 'info',
-                content: item.content || '',
+                extractedItemId: matchedItemId ?? undefined,
+                sectionReference: fb.sectionReference || '',
+                feedbackType: fb.feedbackType || 'comment',
+                severity: fb.severity || 'info',
+                content: fb.content || '',
               }),
             )
             totalFeedback++

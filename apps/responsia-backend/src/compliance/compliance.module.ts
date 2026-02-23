@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import { Requirement } from '../database/entities/requirement.entity'
+import { ExtractedItem } from '../database/entities/extracted-item.entity'
+import { DraftGroup } from '../database/entities/draft-group.entity'
 import { AnalysisFeedback } from '../database/entities/feedback.entity'
 import { AiModule } from '../ai/ai.module'
 import { ProjectsModule } from '../projects/projects.module'
@@ -9,7 +10,7 @@ import { ComplianceService } from './compliance.service'
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Requirement, AnalysisFeedback]),
+    TypeOrmModule.forFeature([ExtractedItem, DraftGroup, AnalysisFeedback]),
     AiModule,
     ProjectsModule,
   ],

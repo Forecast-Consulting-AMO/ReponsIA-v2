@@ -81,7 +81,7 @@ export class ChatController {
     })
   }
 
-  /** SSE: Request an edit suggestion for a requirement (split diff view) */
+  /** SSE: Request an edit suggestion for an extracted item (split diff view) */
   @Post('projects/:pid/chat/edit')
   async editSuggestion(
     @Param('pid', ParseIntPipe) pid: number,
@@ -99,20 +99,20 @@ export class ChatController {
     const abortController = new AbortController()
     req.on('close', () => abortController.abort())
 
-    const { requirement } = await this.chatService.getRequirementText(dto.requirementId)
-    const currentText = requirement.responseText || ''
+    const { item } = await this.chatService.getItemText(dto.itemId)
+    const currentText = item.responseText || ''
 
     const model = this.aiService.resolveModel('chat')
-    const systemPrompt = `Vous êtes un assistant d'édition. L'utilisateur demande une modification de la réponse suivante à une exigence d'appel d'offres.
+    const systemPrompt = `Vous etes un assistant d'edition. L'utilisateur demande une modification de la reponse suivante a un element d'appel d'offres.
 
-Réponse actuelle:
+Reponse actuelle:
 ---
 ${currentText}
 ---
 
 Instruction de modification: ${dto.instruction}
 
-Réécrivez la réponse en appliquant la modification demandée. Retournez UNIQUEMENT le texte modifié, sans commentaire ni explication.`
+Reecrivez la reponse en appliquant la modification demandee. Retournez UNIQUEMENT le texte modifie, sans commentaire ni explication.`
 
     await this.aiService.stream(model, systemPrompt, dto.instruction, {
       onToken: (token) => {
@@ -121,14 +121,14 @@ Réécrivez la réponse en appliquant la modification demandée. Retournez UNIQU
       onDone: async (newText) => {
         // Save as chat message with edit diff
         await this.chatService.saveAssistantMessage(pid, user.sub, newText, {
-          requirementId: dto.requirementId,
+          itemId: dto.itemId,
           editDiff: { old: currentText, new: newText },
         })
         res.write(
           `data: ${JSON.stringify({
             type: 'done',
             diff: { old: currentText, new: newText },
-            requirementId: dto.requirementId,
+            itemId: dto.itemId,
           })}\n\n`,
         )
         res.end()

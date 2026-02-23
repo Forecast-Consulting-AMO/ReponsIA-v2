@@ -8,9 +8,9 @@ export class SendMessageDto {
 }
 
 export class EditSuggestionDto {
-  @ApiProperty({ description: 'ID of the requirement to edit' })
+  @ApiProperty({ description: 'ID of the extracted item to edit' })
   @IsInt()
-  requirementId: number
+  itemId: number
 
   @ApiProperty({ description: 'Edit instruction, e.g. "make it more concise"' })
   @IsString()

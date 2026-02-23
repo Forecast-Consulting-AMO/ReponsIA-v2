@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
 import { ChatMessage } from '../database/entities/chat-message.entity'
 import { DocumentChunk } from '../database/entities/document-chunk.entity'
-import { Requirement } from '../database/entities/requirement.entity'
+import { ExtractedItem } from '../database/entities/extracted-item.entity'
 import { AiService } from '../ai/ai.service'
 import { ProjectsService } from '../projects/projects.service'
 
@@ -16,8 +16,8 @@ export class ChatService {
     private chatRepo: Repository<ChatMessage>,
     @InjectRepository(DocumentChunk)
     private chunkRepo: Repository<DocumentChunk>,
-    @InjectRepository(Requirement)
-    private requirementsRepo: Repository<Requirement>,
+    @InjectRepository(ExtractedItem)
+    private itemRepo: Repository<ExtractedItem>,
     private aiService: AiService,
     private projectsService: ProjectsService,
   ) {}
@@ -47,7 +47,7 @@ export class ChatService {
     projectId: number,
     auth0Id: string,
     content: string,
-    editTarget?: { requirementId: number; editDiff: { old: string; new: string } },
+    editTarget?: { itemId: number; editDiff: { old: string; new: string } },
   ): Promise<ChatMessage> {
     return this.chatRepo.save(
       this.chatRepo.create({
@@ -55,31 +55,31 @@ export class ChatService {
         auth0Id,
         role: 'assistant',
         content,
-        editTargetRequirementId: editTarget?.requirementId,
+        editTargetItemId: editTarget?.itemId,
         editDiff: editTarget?.editDiff,
       }),
     )
   }
 
-  /** Get RAG context from knowledge base + requirements summary */
+  /** Get RAG context from knowledge base + extracted items summary */
   async getProjectContext(projectId: number, query: string): Promise<string> {
     const parts: string[] = []
 
-    // 1. Requirements summary — so the chat knows what the project is about
+    // 1. Extracted items summary — so the chat knows what the project is about
     try {
-      const requirements = await this.requirementsRepo.find({
+      const items = await this.itemRepo.find({
         where: { projectId },
-        order: { sectionNumber: 'ASC' },
+        order: { sectionReference: 'ASC' },
       })
-      if (requirements.length > 0) {
-        const reqSummary = requirements
-          .map((r) => {
-            const status = r.responseStatus || 'pending'
-            const hasResponse = r.responseText ? ' [has response]' : ''
-            return `- ${r.sectionNumber || '?'} ${r.sectionTitle || ''}: ${r.requirementText?.substring(0, 200) || ''} (${status}${hasResponse})`
+      if (items.length > 0) {
+        const itemSummary = items
+          .map((i) => {
+            const status = i.status || 'pending'
+            const hasResponse = i.responseText ? ' [has response]' : ''
+            return `- ${i.sectionReference || '?'} [${i.kind}]: ${i.originalText?.substring(0, 200) || ''} (${status}${hasResponse})`
           })
           .join('\n')
-        parts.push(`Exigences du projet (${requirements.length} au total):\n${reqSummary}`)
+        parts.push(`Elements extraits du projet (${items.length} au total):\n${itemSummary}`)
       }
     } catch {
       // Non-blocking
@@ -107,7 +107,7 @@ export class ChatService {
         parts.push(`Documents pertinents:\n${ragContext}`)
       }
     } catch {
-      // Embedding may fail if no OpenAI key — still return requirements context
+      // Embedding may fail if no OpenAI key — still return items context
     }
 
     return parts.join('\n\n')
@@ -131,10 +131,10 @@ export class ChatService {
     await this.projectsService.verifyAccess(projectId, auth0Id)
   }
 
-  /** Get a requirement's current response text for edit suggestions */
-  async getRequirementText(requirementId: number): Promise<{ requirement: Requirement }> {
-    const req = await this.requirementsRepo.findOne({ where: { id: requirementId } })
-    if (!req) throw new Error('Requirement not found')
-    return { requirement: req }
+  /** Get an extracted item's current response text for edit suggestions */
+  async getItemText(itemId: number): Promise<{ item: ExtractedItem }> {
+    const item = await this.itemRepo.findOne({ where: { id: itemId } })
+    if (!item) throw new Error('Extracted item not found')
+    return { item }
   }
 }

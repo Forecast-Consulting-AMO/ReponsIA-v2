@@ -57,7 +57,7 @@ export class ProjectsService {
     await this.verifyAccess(id, auth0Id)
     const project = await this.projectsRepo.findOne({
       where: { id },
-      relations: ['documents', 'requirements', 'feedback', 'members'],
+      relations: ['documents', 'feedback', 'members'],
     })
     if (!project) throw new NotFoundException('Projet non trouvé')
     return project

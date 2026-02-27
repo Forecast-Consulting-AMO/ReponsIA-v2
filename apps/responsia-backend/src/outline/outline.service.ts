@@ -39,6 +39,31 @@ export class OutlineService {
     })
   }
 
+  /** Start analysis and return immediately — runs AI in background */
+  async startAnalyzeStructure(
+    projectId: number,
+    auth0Id: string,
+  ): Promise<JobProgress> {
+    await this.projectsService.verifyAccess(projectId, auth0Id, 'editor')
+
+    const job = this.jobRepo.create({
+      projectId,
+      jobType: 'structure',
+      status: 'processing',
+      progress: 0,
+      message: 'Analyse de la structure...',
+    })
+    const saved = await this.jobRepo.save(job)
+
+    // Fire-and-forget: don't block the HTTP response
+    this.runAnalyzeStructure(projectId, saved).catch((err) => {
+      this.logger.error(`Structure analysis failed: ${err.message}`)
+    })
+
+    return saved
+  }
+
+  /** Full synchronous analyze — used by the setup pipeline (already background) */
   async analyzeStructure(
     projectId: number,
     auth0Id: string,
@@ -53,7 +78,14 @@ export class OutlineService {
       message: 'Analyse de la structure...',
     })
     await this.jobRepo.save(job)
+    await this.runAnalyzeStructure(projectId, job)
+  }
 
+  /** Core analysis logic shared by both sync and async paths */
+  private async runAnalyzeStructure(
+    projectId: number,
+    job: JobProgress,
+  ): Promise<void> {
     try {
       // Clear existing outline for this project
       await this.draftGroupRepo.delete({ projectId })

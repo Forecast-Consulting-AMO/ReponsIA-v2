@@ -25,11 +25,13 @@ export class OutlineController {
   constructor(private outlineService: OutlineService) {}
 
   @Post('projects/:pid/outline/analyze')
-  analyze(
+  async analyze(
     @Param('pid', ParseIntPipe) pid: number,
     @CurrentUser() user: { sub: string },
   ) {
-    return this.outlineService.analyzeStructure(pid, user.sub)
+    // Fire-and-forget: verify access, start background job, return immediately
+    const job = await this.outlineService.startAnalyzeStructure(pid, user.sub)
+    return { jobId: job.id, status: job.status }
   }
 
   @Get('projects/:pid/outline')

@@ -22,11 +22,12 @@ export class ExtractionController {
   constructor(private extractionService: ExtractionService) {}
 
   @Post('projects/:pid/extract')
-  extract(
+  async extract(
     @Param('pid', ParseIntPipe) pid: number,
     @CurrentUser() user: { sub: string },
   ) {
-    return this.extractionService.extractItems(pid, user.sub)
+    const job = await this.extractionService.startExtractItems(pid, user.sub)
+    return { jobId: job.id, status: job.status }
   }
 
   @Get('projects/:pid/items')

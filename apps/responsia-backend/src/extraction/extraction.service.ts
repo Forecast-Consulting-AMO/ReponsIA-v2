@@ -59,6 +59,31 @@ export class ExtractionService {
     return this.itemRepo.save(item)
   }
 
+  /** Start extraction and return immediately — runs AI in background */
+  async startExtractItems(
+    projectId: number,
+    auth0Id: string,
+  ): Promise<JobProgress> {
+    await this.projectsService.verifyAccess(projectId, auth0Id, 'editor')
+
+    const job = this.jobRepo.create({
+      projectId,
+      jobType: 'extraction',
+      status: 'processing',
+      progress: 0,
+      message: 'Extraction des elements...',
+    })
+    const saved = await this.jobRepo.save(job)
+
+    // Fire-and-forget
+    this.runExtractItems(projectId, saved).catch((err) => {
+      this.logger.error(`Extraction failed: ${err.message}`)
+    })
+
+    return saved
+  }
+
+  /** Full synchronous extract — used by setup pipeline (already background) */
   async extractItems(
     projectId: number,
     auth0Id: string,
@@ -73,7 +98,14 @@ export class ExtractionService {
       message: 'Extraction des elements...',
     })
     await this.jobRepo.save(job)
+    await this.runExtractItems(projectId, job)
+  }
 
+  /** Core extraction logic shared by both sync and async paths */
+  private async runExtractItems(
+    projectId: number,
+    job: JobProgress,
+  ): Promise<void> {
     try {
       // Clear existing items
       await this.itemRepo.delete({ projectId })

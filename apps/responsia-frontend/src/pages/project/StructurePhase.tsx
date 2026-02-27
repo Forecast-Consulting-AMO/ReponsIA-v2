@@ -190,8 +190,17 @@ export const StructurePhase = ({ projectId }: Props) => {
   const handleAnalyzeStructure = async () => {
     try {
       await analyzeStructure.mutateAsync()
-      refetchOutline()
-      enqueueSnackbar(t('project.structure.analyzeBtn') + ' - OK', { variant: 'success' })
+      enqueueSnackbar(t('project.structure.analyzing'), { variant: 'info' })
+      // Poll for completion — job runs in background
+      const poll = setInterval(async () => {
+        const updated = await refetchOutline()
+        if (updated.data && updated.data.length > 0) {
+          clearInterval(poll)
+          enqueueSnackbar(t('project.structure.analyzeBtn') + ' - OK', { variant: 'success' })
+        }
+      }, 3000)
+      // Stop polling after 5 minutes
+      setTimeout(() => clearInterval(poll), 300000)
     } catch (err: any) {
       const msg = err?.response?.data?.message || err?.message || t('errors.http.generic')
       enqueueSnackbar(msg, { variant: 'error' })

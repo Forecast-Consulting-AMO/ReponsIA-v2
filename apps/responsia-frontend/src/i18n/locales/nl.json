@@ -91,6 +91,8 @@
     "classifying": "Classificeren...",
     "confirmUpload": "Upload bevestigen",
     "jobs": {
+      "structure": "Structuuranalyse",
+      "extraction": "Elementextractie",
       "analysis": "Extractie van vereisten",
       "indexing": "Kennisindexering",
       "feedback": "Feedbackextractie",

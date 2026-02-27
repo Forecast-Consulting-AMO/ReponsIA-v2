@@ -91,6 +91,8 @@
     "classifying": "Classifying...",
     "confirmUpload": "Confirm upload",
     "jobs": {
+      "structure": "Structure analysis",
+      "extraction": "Item extraction",
       "analysis": "Requirement extraction",
       "indexing": "Knowledge indexing",
       "feedback": "Feedback extraction",

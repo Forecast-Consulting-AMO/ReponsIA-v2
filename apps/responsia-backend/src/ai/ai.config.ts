@@ -18,22 +18,22 @@ export const AI_MODELS: AiModel[] = [
     id: 'claude-sonnet-4.6',
     label: 'Claude Sonnet 4.6',
     provider: 'anthropic',
-    modelId: 'claude-sonnet-4-6-20250514',
+    modelId: 'claude-sonnet-4-6',
     maxOutput: 16384,
   },
   {
     id: 'claude-opus-4.6',
     label: 'Claude Opus 4.6',
     provider: 'anthropic',
-    modelId: 'claude-opus-4-6-20250514',
+    modelId: 'claude-opus-4-6',
     maxOutput: 16384,
   },
   {
-    id: 'gpt-chat-5.2',
-    label: 'GPT Chat 5.2',
+    id: 'gpt-4o',
+    label: 'GPT-4o',
     provider: 'openai',
-    modelId: 'gpt-chat-5.2',
-    maxOutput: 32768,
+    modelId: 'gpt-4o',
+    maxOutput: 16384,
   },
 ]
 
@@ -57,7 +57,7 @@ export const DEFAULT_MODELS: Record<OperationType, string> = {
   feedback: 'claude-sonnet-4.6',
   compliance: 'claude-sonnet-4.6',
   chat: 'claude-sonnet-4.6',
-  embedding: 'gpt-chat-5.2',
+  embedding: 'gpt-4o',
 }
 
 export function getModelById(id: string): AiModel | undefined {

@@ -116,13 +116,17 @@ export const StructurePhase = ({ projectId }: Props) => {
     setPendingFiles((prev) => [...prev, ...pending])
     if (fileInputRef.current) fileInputRef.current.value = ''
 
-    // Auto-classify in background
+    // Auto-classify in background (sends actual files for content-based classification)
     try {
-      const filenames = fileList.map((f) => f.name)
+      const formData = new FormData()
+      for (const f of fileList) {
+        formData.append('files', f)
+      }
       const result = await customInstance<{ classifications: Record<string, string> }>({
         url: '/api/v1/documents/classify',
         method: 'POST',
-        data: { filenames },
+        data: formData,
+        headers: { 'Content-Type': 'multipart/form-data' },
       })
       setPendingFiles((prev) =>
         prev.map((pf) => {
@@ -188,8 +192,9 @@ export const StructurePhase = ({ projectId }: Props) => {
       await analyzeStructure.mutateAsync()
       refetchOutline()
       enqueueSnackbar(t('project.structure.analyzeBtn') + ' - OK', { variant: 'success' })
-    } catch {
-      enqueueSnackbar(t('errors.http.generic'), { variant: 'error' })
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || t('errors.http.generic')
+      enqueueSnackbar(msg, { variant: 'error' })
     }
   }
 
@@ -227,13 +232,13 @@ export const StructurePhase = ({ projectId }: Props) => {
 
   const handleMoveSection = async (index: number, direction: 'up' | 'down') => {
     if (!outline) return
-    const sorted = [...outline].sort((a: any, b: any) => a.sortOrder - b.sortOrder)
+    const sorted = [...outline].sort((a: any, b: any) => a.position - b.position)
     const newIndex = direction === 'up' ? index - 1 : index + 1
     if (newIndex < 0 || newIndex >= sorted.length) return
 
     const reordered = sorted.map((s: any, i: number) => ({
       id: s.id,
-      sortOrder: i === index ? newIndex : i === newIndex ? index : i,
+      position: i === index ? newIndex : i === newIndex ? index : i,
     }))
     try {
       await reorderOutline.mutateAsync(reordered)
@@ -249,7 +254,7 @@ export const StructurePhase = ({ projectId }: Props) => {
     setEditDescription(section.description || '')
   }
 
-  const sortedOutline = [...(outline || [])].sort((a: any, b: any) => a.sortOrder - b.sortOrder)
+  const sortedOutline = [...(outline || [])].sort((a: any, b: any) => a.position - b.position)
 
   return (
     <Box>

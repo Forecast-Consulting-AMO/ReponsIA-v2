@@ -103,7 +103,7 @@ export class DocumentsService {
     return this.documentsRepo.save(doc)
   }
 
-  private async extractText(
+  async extractText(
     buffer: Buffer,
     mimeType: string,
     filename: string,

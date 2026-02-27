@@ -25,7 +25,7 @@ export class SetupService {
   ) {
     // Register queue handlers
     this.queueService.register('setup-pipeline', async (payload) => {
-      await this.runPipeline(payload.projectId as number)
+      await this.runPipeline(payload.projectId as number, payload.auth0Id as string)
     })
     this.queueService.register('indexing', async (payload) => {
       await this.indexingProcessor.process(payload.projectId as number)
@@ -41,19 +41,19 @@ export class SetupService {
     auth0Id: string,
   ): Promise<{ jobId: string }> {
     await this.projectsService.verifyAccess(projectId, auth0Id, 'editor')
-    const jobId = await this.queueService.send('setup-pipeline', { projectId })
+    const jobId = await this.queueService.send('setup-pipeline', { projectId, auth0Id })
     return { jobId }
   }
 
   /** Run the 4-phase pipeline: structure → extraction → indexing → feedback */
-  private async runPipeline(projectId: number): Promise<void> {
+  private async runPipeline(projectId: number, auth0Id: string): Promise<void> {
     this.logger.log(`Starting setup pipeline for project ${projectId}`)
 
     // Step 1: Analyze structure (outline sections + draft groups)
-    await this.outlineService.analyzeStructure(projectId, 'system')
+    await this.outlineService.analyzeStructure(projectId, auth0Id)
 
     // Step 2: Extract items (questions + conditions from RFP docs)
-    await this.extractionService.extractItems(projectId, 'system')
+    await this.extractionService.extractItems(projectId, auth0Id)
 
     // Step 3: Index knowledge base (past submissions + references)
     await this.indexingProcessor.process(projectId)

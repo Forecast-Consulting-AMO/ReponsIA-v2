@@ -91,6 +91,8 @@
     "classifying": "Classification en cours...",
     "confirmUpload": "Confirmer l'import",
     "jobs": {
+      "structure": "Analyse de la structure",
+      "extraction": "Extraction des éléments",
       "analysis": "Extraction des exigences",
       "indexing": "Indexation des connaissances",
       "feedback": "Extraction des retours",
